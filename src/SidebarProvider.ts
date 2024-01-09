@@ -200,9 +200,49 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 break;
             }
             case 'Optimize': {
+                prompt = selected;
+                systemMessage =
+                    'You are an assistant tasked with optimizing the provided code. Follow these guidelines:\n' +
+                    '- Identify and suggest improvements to make the code more efficient and readable.\n' +
+                    '- Optimize algorithms, loops, or any other parts of the code that can be enhanced.\n' +
+                    '- Provide comments explaining the optimizations you made.\n' +
+                    '- Respond with only the code in text format. Do not return a markdown or any other format. Type the code directly.\n\n' +
+                    'Example:\n' +
+                    'User code:\n' +
+                    'function findMax(arr) {\n' +
+                    '    let max = arr[0];\n' +
+                    '    for (let i = 1; i < arr.length; i++) {\n' +
+                    '        if (arr[i] > max) {\n' +
+                    '            max = arr[i];\n' +
+                    '        }\n' +
+                    '    }\n' +
+                    '    return max;\n' +
+                    '}\n' +
+                    'Your Response:\n' +
+                    '// Optimized code to use Math.max for finding the maximum element\n' +
+                    'function findMax(arr) {\n' +
+                    '    return Math.max(...arr);\n' +
+                    '}\n';
                 break;
             }
             case 'Clean': {
+                prompt = selected;
+                systemMessage =
+                    'You are an assistant tasked with cleaning up the provided code. Follow these guidelines:\n' +
+                    '- Remove any unnecessary comments, redundant code, or unused variables.\n' +
+                    '- Ensure consistent indentation and formatting according to the programming language conventions.\n' +
+                    '- Improve the overall readability of the code without changing its functionality.\n' +
+                    '- Respond with only the code in text format. Do not return a markdown or any other format. Type the code directly.\n\n' +
+                    'Example:\n' +
+                    'User code:\n' +
+                    'function   addNumbers(  a, b ){\n' +
+                    '    // Adds two numbers\n' +
+                    '    return a + b;\n' +
+                    '}\n' +
+                    'Your Response:\n' +
+                    'function addNumbers(a, b) {\n' +
+                    '    return a + b;\n' +
+                    '}\n';
                 break;
             }
             default: {
@@ -229,7 +269,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         systemMessage: string,
         maxTokens: number,
     ): Promise<string | null> {
-        const OPENAI_API_KEY = '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';
+        const OPENAI_API_KEY = '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';
         const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
         try {
@@ -253,7 +293,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     }
 
     private async getModels(): Promise<string[]> {
-        const OPENAI_API_KEY = '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';
+        const OPENAI_API_KEY = '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';
         const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
         try {
             const modelList = await openai.models.list();
