@@ -64,6 +64,9 @@ var app = (function () {
         else if (node.getAttribute(attribute) !== value)
             node.setAttribute(attribute, value);
     }
+    function to_number(value) {
+        return value === '' ? null : +value;
+    }
     function children(element) {
         return Array.from(element.childNodes);
     }
@@ -77,6 +80,22 @@ var app = (function () {
         else {
             node.style.setProperty(key, value, important ? 'important' : '');
         }
+    }
+    function select_option(select, value, mounting) {
+        for (let i = 0; i < select.options.length; i += 1) {
+            const option = select.options[i];
+            if (option.__value === value) {
+                option.selected = true;
+                return;
+            }
+        }
+        if (!mounting || value !== undefined) {
+            select.selectedIndex = -1; // no option should be selected
+        }
+    }
+    function select_value(select) {
+        const selected_option = select.querySelector(':checked');
+        return selected_option && selected_option.__value;
     }
     function custom_event(type, detail, { bubbles = false, cancelable = false } = {}) {
         const e = document.createEvent('CustomEvent');
@@ -267,6 +286,99 @@ var app = (function () {
             callback();
         }
     }
+
+    function destroy_block(block, lookup) {
+        block.d(1);
+        lookup.delete(block.key);
+    }
+    function update_keyed_each(old_blocks, dirty, get_key, dynamic, ctx, list, lookup, node, destroy, create_each_block, next, get_context) {
+        let o = old_blocks.length;
+        let n = list.length;
+        let i = o;
+        const old_indexes = {};
+        while (i--)
+            old_indexes[old_blocks[i].key] = i;
+        const new_blocks = [];
+        const new_lookup = new Map();
+        const deltas = new Map();
+        const updates = [];
+        i = n;
+        while (i--) {
+            const child_ctx = get_context(ctx, list, i);
+            const key = get_key(child_ctx);
+            let block = lookup.get(key);
+            if (!block) {
+                block = create_each_block(key, child_ctx);
+                block.c();
+            }
+            else if (dynamic) {
+                // defer updates until all the DOM shuffling is done
+                updates.push(() => block.p(child_ctx, dirty));
+            }
+            new_lookup.set(key, new_blocks[i] = block);
+            if (key in old_indexes)
+                deltas.set(key, Math.abs(i - old_indexes[key]));
+        }
+        const will_move = new Set();
+        const did_move = new Set();
+        function insert(block) {
+            transition_in(block, 1);
+            block.m(node, next);
+            lookup.set(block.key, block);
+            next = block.first;
+            n--;
+        }
+        while (o && n) {
+            const new_block = new_blocks[n - 1];
+            const old_block = old_blocks[o - 1];
+            const new_key = new_block.key;
+            const old_key = old_block.key;
+            if (new_block === old_block) {
+                // do nothing
+                next = new_block.first;
+                o--;
+                n--;
+            }
+            else if (!new_lookup.has(old_key)) {
+                // remove old block
+                destroy(old_block, lookup);
+                o--;
+            }
+            else if (!lookup.has(new_key) || will_move.has(new_key)) {
+                insert(new_block);
+            }
+            else if (did_move.has(old_key)) {
+                o--;
+            }
+            else if (deltas.get(new_key) > deltas.get(old_key)) {
+                did_move.add(new_key);
+                insert(new_block);
+            }
+            else {
+                will_move.add(old_key);
+                o--;
+            }
+        }
+        while (o--) {
+            const old_block = old_blocks[o];
+            if (!new_lookup.has(old_block.key))
+                destroy(old_block, lookup);
+        }
+        while (n)
+            insert(new_blocks[n - 1]);
+        run_all(updates);
+        return new_blocks;
+    }
+    function validate_each_keys(ctx, list, get_context, get_key) {
+        const keys = new Set();
+        for (let i = 0; i < list.length; i++) {
+            const key = get_key(get_context(ctx, list, i));
+            if (keys.has(key)) {
+                throw new Error('Cannot have duplicate keys in a keyed each');
+            }
+            keys.add(key);
+        }
+    }
     function create_component(block) {
         block && block.c();
     }
@@ -440,6 +552,26 @@ var app = (function () {
         else
             dispatch_dev('SvelteDOMSetAttribute', { node, attribute, value });
     }
+    function prop_dev(node, property, value) {
+        node[property] = value;
+        dispatch_dev('SvelteDOMSetProperty', { node, property, value });
+    }
+    function set_data_dev(text, data) {
+        data = '' + data;
+        if (text.data === data)
+            return;
+        dispatch_dev('SvelteDOMSetData', { node: text, data });
+        text.data = data;
+    }
+    function validate_each_argument(arg) {
+        if (typeof arg !== 'string' && !(arg && typeof arg === 'object' && 'length' in arg)) {
+            let msg = '{#each} only iterates over array-like objects.';
+            if (typeof Symbol === 'function' && arg && Symbol.iterator in arg) {
+                msg += ' You can use a spread to convert this iterable into an array.';
+            }
+            throw new Error(msg);
+        }
+    }
     function validate_slots(name, slot, keys) {
         for (const slot_key of Object.keys(slot)) {
             if (!~keys.indexOf(slot_key)) {
@@ -515,11 +647,11 @@ var app = (function () {
     			t7 = space();
     			li4 = element("li");
     			button4 = element("button");
-    			button4.textContent = "Rewrite";
+    			button4.textContent = "Clean";
     			t9 = space();
     			li5 = element("li");
     			button5 = element("button");
-    			button5.textContent = "Clean";
+    			button5.textContent = "Options";
     			attr_dev(button0, "class", "svelte-1862z36");
     			add_location(button0, file$6, 13, 12, 257);
     			add_location(li0, file$6, 12, 8, 239);
@@ -536,8 +668,8 @@ var app = (function () {
     			add_location(button4, file$6, 25, 12, 673);
     			add_location(li4, file$6, 24, 8, 655);
     			attr_dev(button5, "class", "svelte-1862z36");
-    			add_location(button5, file$6, 28, 12, 779);
-    			add_location(li5, file$6, 27, 8, 761);
+    			add_location(button5, file$6, 28, 12, 775);
+    			add_location(li5, file$6, 27, 8, 757);
     			attr_dev(ul, "class", "svelte-1862z36");
     			add_location(ul, file$6, 11, 4, 225);
     			attr_dev(nav, "class", "svelte-1862z36");
@@ -620,8 +752,8 @@ var app = (function () {
     	const click_handler_1 = () => setNavView('Debug');
     	const click_handler_2 = () => setNavView('Test');
     	const click_handler_3 = () => setNavView('Optimize');
-    	const click_handler_4 = () => setNavView('Rewrite');
-    	const click_handler_5 = () => setNavView('Clean');
+    	const click_handler_4 = () => setNavView('Clean');
+    	const click_handler_5 = () => setNavView('Options');
 
     	$$self.$capture_state = () => ({
     		createEventDispatcher,
@@ -656,7 +788,7 @@ var app = (function () {
 
     /* webviews\components\Debug.svelte generated by Svelte v3.59.2 */
 
-    const { console: console_1$6 } = globals;
+    const { console: console_1$5 } = globals;
     const file$5 = "webviews\\components\\Debug.svelte";
 
     function create_fragment$6(ctx) {
@@ -795,22 +927,22 @@ var app = (function () {
 
     	$$self.$$.on_mount.push(function () {
     		if (getSelectedText === undefined && !('getSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['getSelectedText']])) {
-    			console_1$6.warn("<Debug> was created without expected prop 'getSelectedText'");
+    			console_1$5.warn("<Debug> was created without expected prop 'getSelectedText'");
     		}
 
     		if (sendText === undefined && !('sendText' in $$props || $$self.$$.bound[$$self.$$.props['sendText']])) {
-    			console_1$6.warn("<Debug> was created without expected prop 'sendText'");
+    			console_1$5.warn("<Debug> was created without expected prop 'sendText'");
     		}
 
     		if (replaceSelectedText === undefined && !('replaceSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['replaceSelectedText']])) {
-    			console_1$6.warn("<Debug> was created without expected prop 'replaceSelectedText'");
+    			console_1$5.warn("<Debug> was created without expected prop 'replaceSelectedText'");
     		}
     	});
 
     	const writable_props = ['getSelectedText', 'sendText', 'replaceSelectedText'];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$6.warn(`<Debug> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$5.warn(`<Debug> was created with unknown prop '${key}'`);
     	});
 
     	const click_handler = () => getSelectedText();
@@ -914,7 +1046,7 @@ var app = (function () {
 
     /* webviews\components\Test.svelte generated by Svelte v3.59.2 */
 
-    const { console: console_1$5 } = globals;
+    const { console: console_1$4 } = globals;
     const file$4 = "webviews\\components\\Test.svelte";
 
     function create_fragment$5(ctx) {
@@ -1053,22 +1185,22 @@ var app = (function () {
 
     	$$self.$$.on_mount.push(function () {
     		if (getSelectedText === undefined && !('getSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['getSelectedText']])) {
-    			console_1$5.warn("<Test> was created without expected prop 'getSelectedText'");
+    			console_1$4.warn("<Test> was created without expected prop 'getSelectedText'");
     		}
 
     		if (sendText === undefined && !('sendText' in $$props || $$self.$$.bound[$$self.$$.props['sendText']])) {
-    			console_1$5.warn("<Test> was created without expected prop 'sendText'");
+    			console_1$4.warn("<Test> was created without expected prop 'sendText'");
     		}
 
     		if (replaceSelectedText === undefined && !('replaceSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['replaceSelectedText']])) {
-    			console_1$5.warn("<Test> was created without expected prop 'replaceSelectedText'");
+    			console_1$4.warn("<Test> was created without expected prop 'replaceSelectedText'");
     		}
     	});
 
     	const writable_props = ['getSelectedText', 'sendText', 'replaceSelectedText'];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$5.warn(`<Test> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$4.warn(`<Test> was created with unknown prop '${key}'`);
     	});
 
     	const click_handler = () => getSelectedText();
@@ -1172,7 +1304,7 @@ var app = (function () {
 
     /* webviews\components\Optimize.svelte generated by Svelte v3.59.2 */
 
-    const { console: console_1$4 } = globals;
+    const { console: console_1$3 } = globals;
     const file$3 = "webviews\\components\\Optimize.svelte";
 
     function create_fragment$4(ctx) {
@@ -1311,22 +1443,22 @@ var app = (function () {
 
     	$$self.$$.on_mount.push(function () {
     		if (getSelectedText === undefined && !('getSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['getSelectedText']])) {
-    			console_1$4.warn("<Optimize> was created without expected prop 'getSelectedText'");
+    			console_1$3.warn("<Optimize> was created without expected prop 'getSelectedText'");
     		}
 
     		if (sendText === undefined && !('sendText' in $$props || $$self.$$.bound[$$self.$$.props['sendText']])) {
-    			console_1$4.warn("<Optimize> was created without expected prop 'sendText'");
+    			console_1$3.warn("<Optimize> was created without expected prop 'sendText'");
     		}
 
     		if (replaceSelectedText === undefined && !('replaceSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['replaceSelectedText']])) {
-    			console_1$4.warn("<Optimize> was created without expected prop 'replaceSelectedText'");
+    			console_1$3.warn("<Optimize> was created without expected prop 'replaceSelectedText'");
     		}
     	});
 
     	const writable_props = ['getSelectedText', 'sendText', 'replaceSelectedText'];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$4.warn(`<Optimize> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$3.warn(`<Optimize> was created with unknown prop '${key}'`);
     	});
 
     	const click_handler = () => getSelectedText();
@@ -1428,55 +1560,116 @@ var app = (function () {
     	}
     }
 
-    /* webviews\components\Rewrite.svelte generated by Svelte v3.59.2 */
+    /* webviews\components\Options.svelte generated by Svelte v3.59.2 */
+    const file$2 = "webviews\\components\\Options.svelte";
 
-    const { console: console_1$3 } = globals;
-    const file$2 = "webviews\\components\\Rewrite.svelte";
+    function get_each_context(ctx, list, i) {
+    	const child_ctx = ctx.slice();
+    	child_ctx[8] = list[i];
+    	return child_ctx;
+    }
+
+    // (23:4) {#each openaiModels as model (model)}
+    function create_each_block(key_1, ctx) {
+    	let option;
+    	let t_value = /*model*/ ctx[8] + "";
+    	let t;
+    	let option_value_value;
+
+    	const block = {
+    		key: key_1,
+    		first: null,
+    		c: function create() {
+    			option = element("option");
+    			t = text(t_value);
+    			option.__value = option_value_value = /*model*/ ctx[8];
+    			option.value = option.__value;
+    			add_location(option, file$2, 23, 8, 625);
+    			this.first = option;
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, option, anchor);
+    			append_dev(option, t);
+    		},
+    		p: function update(new_ctx, dirty) {
+    			ctx = new_ctx;
+    			if (dirty & /*openaiModels*/ 4 && t_value !== (t_value = /*model*/ ctx[8] + "")) set_data_dev(t, t_value);
+
+    			if (dirty & /*openaiModels*/ 4 && option_value_value !== (option_value_value = /*model*/ ctx[8])) {
+    				prop_dev(option, "__value", option_value_value);
+    				option.value = option.__value;
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(option);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_each_block.name,
+    		type: "each",
+    		source: "(23:4) {#each openaiModels as model (model)}",
+    		ctx
+    	});
+
+    	return block;
+    }
 
     function create_fragment$3(ctx) {
     	let h1;
     	let t1;
-    	let button0;
+    	let select;
+    	let each_blocks = [];
+    	let each_1_lookup = new Map();
+    	let t2;
+    	let p0;
     	let t3;
-    	let textarea0;
     	let t4;
-    	let button1;
-    	let t6;
-    	let textarea1;
+    	let t5;
+    	let p1;
     	let t7;
-    	let button2;
+    	let input;
     	let mounted;
     	let dispose;
+    	let each_value = /*openaiModels*/ ctx[2];
+    	validate_each_argument(each_value);
+    	const get_key = ctx => /*model*/ ctx[8];
+    	validate_each_keys(ctx, each_value, get_each_context, get_key);
+
+    	for (let i = 0; i < each_value.length; i += 1) {
+    		let child_ctx = get_each_context(ctx, each_value, i);
+    		let key = get_key(child_ctx);
+    		each_1_lookup.set(key, each_blocks[i] = create_each_block(key, child_ctx));
+    	}
 
     	const block = {
     		c: function create() {
     			h1 = element("h1");
-    			h1.textContent = "Rewrite view";
+    			h1.textContent = "Options";
     			t1 = space();
-    			button0 = element("button");
-    			button0.textContent = "Selection to prompt";
-    			t3 = space();
-    			textarea0 = element("textarea");
-    			t4 = space();
-    			button1 = element("button");
-    			button1.textContent = "Generate rewrited code";
-    			t6 = space();
-    			textarea1 = element("textarea");
+    			select = element("select");
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].c();
+    			}
+
+    			t2 = space();
+    			p0 = element("p");
+    			t3 = text("Selected Model: ");
+    			t4 = text(/*currentModel*/ ctx[0]);
+    			t5 = space();
+    			p1 = element("p");
+    			p1.textContent = "Max token response:";
     			t7 = space();
-    			button2 = element("button");
-    			button2.textContent = "Replace selected text";
-    			add_location(h1, file$2, 19, 0, 510);
-    			add_location(button0, file$2, 20, 0, 533);
-    			attr_dev(textarea0, "placeholder", "Prompt code");
-    			set_style(textarea0, "width", "100%");
-    			set_style(textarea0, "height", "200px");
-    			add_location(textarea0, file$2, 22, 0, 608);
-    			add_location(button1, file$2, 25, 0, 721);
-    			attr_dev(textarea1, "placeholder", "Response...");
-    			set_style(textarea1, "width", "100%");
-    			set_style(textarea1, "height", "200px");
-    			add_location(textarea1, file$2, 27, 0, 813);
-    			add_location(button2, file$2, 30, 0, 928);
+    			input = element("input");
+    			add_location(h1, file$2, 19, 0, 490);
+    			if (/*currentModel*/ ctx[0] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[5].call(select));
+    			add_location(select, file$2, 21, 0, 510);
+    			add_location(p0, file$2, 27, 0, 691);
+    			add_location(p1, file$2, 29, 0, 732);
+    			attr_dev(input, "type", "number");
+    			add_location(input, file$2, 30, 0, 760);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1484,37 +1677,52 @@ var app = (function () {
     		m: function mount(target, anchor) {
     			insert_dev(target, h1, anchor);
     			insert_dev(target, t1, anchor);
-    			insert_dev(target, button0, anchor);
-    			insert_dev(target, t3, anchor);
-    			insert_dev(target, textarea0, anchor);
-    			set_input_value(textarea0, /*copiedText*/ ctx[3]);
-    			insert_dev(target, t4, anchor);
-    			insert_dev(target, button1, anchor);
-    			insert_dev(target, t6, anchor);
-    			insert_dev(target, textarea1, anchor);
-    			set_input_value(textarea1, /*responseText*/ ctx[4]);
+    			insert_dev(target, select, anchor);
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				if (each_blocks[i]) {
+    					each_blocks[i].m(select, null);
+    				}
+    			}
+
+    			select_option(select, /*currentModel*/ ctx[0], true);
+    			insert_dev(target, t2, anchor);
+    			insert_dev(target, p0, anchor);
+    			append_dev(p0, t3);
+    			append_dev(p0, t4);
+    			insert_dev(target, t5, anchor);
+    			insert_dev(target, p1, anchor);
     			insert_dev(target, t7, anchor);
-    			insert_dev(target, button2, anchor);
+    			insert_dev(target, input, anchor);
+    			set_input_value(input, /*maxTokens*/ ctx[1]);
 
     			if (!mounted) {
     				dispose = [
-    					listen_dev(button0, "click", /*click_handler*/ ctx[5], false, false, false, false),
-    					listen_dev(textarea0, "input", /*textarea0_input_handler*/ ctx[6]),
-    					listen_dev(button1, "click", /*click_handler_1*/ ctx[7], false, false, false, false),
-    					listen_dev(textarea1, "input", /*textarea1_input_handler*/ ctx[8]),
-    					listen_dev(button2, "click", /*click_handler_2*/ ctx[9], false, false, false, false)
+    					listen_dev(select, "change", /*select_change_handler*/ ctx[5]),
+    					listen_dev(select, "change", /*handleSelection*/ ctx[3], false, false, false, false),
+    					listen_dev(input, "input", /*input_input_handler*/ ctx[6]),
+    					listen_dev(input, "change", /*handleMaxTokens*/ ctx[4], false, false, false, false)
     				];
 
     				mounted = true;
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*copiedText*/ 8) {
-    				set_input_value(textarea0, /*copiedText*/ ctx[3]);
+    			if (dirty & /*openaiModels*/ 4) {
+    				each_value = /*openaiModels*/ ctx[2];
+    				validate_each_argument(each_value);
+    				validate_each_keys(ctx, each_value, get_each_context, get_key);
+    				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, select, destroy_block, create_each_block, null, get_each_context);
     			}
 
-    			if (dirty & /*responseText*/ 16) {
-    				set_input_value(textarea1, /*responseText*/ ctx[4]);
+    			if (dirty & /*currentModel, openaiModels*/ 5) {
+    				select_option(select, /*currentModel*/ ctx[0]);
+    			}
+
+    			if (dirty & /*currentModel*/ 1) set_data_dev(t4, /*currentModel*/ ctx[0]);
+
+    			if (dirty & /*maxTokens*/ 2 && to_number(input.value) !== /*maxTokens*/ ctx[1]) {
+    				set_input_value(input, /*maxTokens*/ ctx[1]);
     			}
     		},
     		i: noop,
@@ -1522,15 +1730,18 @@ var app = (function () {
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(h1);
     			if (detaching) detach_dev(t1);
-    			if (detaching) detach_dev(button0);
-    			if (detaching) detach_dev(t3);
-    			if (detaching) detach_dev(textarea0);
-    			if (detaching) detach_dev(t4);
-    			if (detaching) detach_dev(button1);
-    			if (detaching) detach_dev(t6);
-    			if (detaching) detach_dev(textarea1);
+    			if (detaching) detach_dev(select);
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].d();
+    			}
+
+    			if (detaching) detach_dev(t2);
+    			if (detaching) detach_dev(p0);
+    			if (detaching) detach_dev(t5);
+    			if (detaching) detach_dev(p1);
     			if (detaching) detach_dev(t7);
-    			if (detaching) detach_dev(button2);
+    			if (detaching) detach_dev(input);
     			mounted = false;
     			run_all(dispose);
     		}
@@ -1549,80 +1760,73 @@ var app = (function () {
 
     function instance$3($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('Rewrite', slots, []);
-    	let { getSelectedText } = $$props;
-    	let { sendText } = $$props;
-    	let { replaceSelectedText } = $$props;
-    	console.log(getSelectedText);
-    	let copiedText = '';
-    	let responseText = '';
+    	validate_slots('Options', slots, []);
+    	let { openaiModels } = $$props;
+    	let { currentModel } = $$props;
+    	let { maxTokens } = $$props;
+    	const dispatch = createEventDispatcher();
 
-    	window.addEventListener('message', event => {
-    		const message = event.data;
+    	function handleSelection(event) {
+    		$$invalidate(0, currentModel = event.target.value);
+    		dispatch('changeModel', currentModel);
+    	}
 
-    		if (message.type === 'setCopiedText') {
-    			$$invalidate(3, copiedText = message.value);
-    		} else if (message.type === 'responseText') {
-    			$$invalidate(4, responseText = message.value);
-    		}
-    	});
+    	function handleMaxTokens(event) {
+    		$$invalidate(1, maxTokens = event.target.value);
+    		dispatch('changeMaxTokens', maxTokens);
+    	}
 
     	$$self.$$.on_mount.push(function () {
-    		if (getSelectedText === undefined && !('getSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['getSelectedText']])) {
-    			console_1$3.warn("<Rewrite> was created without expected prop 'getSelectedText'");
+    		if (openaiModels === undefined && !('openaiModels' in $$props || $$self.$$.bound[$$self.$$.props['openaiModels']])) {
+    			console.warn("<Options> was created without expected prop 'openaiModels'");
     		}
 
-    		if (sendText === undefined && !('sendText' in $$props || $$self.$$.bound[$$self.$$.props['sendText']])) {
-    			console_1$3.warn("<Rewrite> was created without expected prop 'sendText'");
+    		if (currentModel === undefined && !('currentModel' in $$props || $$self.$$.bound[$$self.$$.props['currentModel']])) {
+    			console.warn("<Options> was created without expected prop 'currentModel'");
     		}
 
-    		if (replaceSelectedText === undefined && !('replaceSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['replaceSelectedText']])) {
-    			console_1$3.warn("<Rewrite> was created without expected prop 'replaceSelectedText'");
+    		if (maxTokens === undefined && !('maxTokens' in $$props || $$self.$$.bound[$$self.$$.props['maxTokens']])) {
+    			console.warn("<Options> was created without expected prop 'maxTokens'");
     		}
     	});
 
-    	const writable_props = ['getSelectedText', 'sendText', 'replaceSelectedText'];
+    	const writable_props = ['openaiModels', 'currentModel', 'maxTokens'];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$3.warn(`<Rewrite> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Options> was created with unknown prop '${key}'`);
     	});
 
-    	const click_handler = () => getSelectedText();
-
-    	function textarea0_input_handler() {
-    		copiedText = this.value;
-    		$$invalidate(3, copiedText);
+    	function select_change_handler() {
+    		currentModel = select_value(this);
+    		$$invalidate(0, currentModel);
+    		$$invalidate(2, openaiModels);
     	}
 
-    	const click_handler_1 = () => sendText(copiedText, 'Rewrite');
-
-    	function textarea1_input_handler() {
-    		responseText = this.value;
-    		$$invalidate(4, responseText);
+    	function input_input_handler() {
+    		maxTokens = to_number(this.value);
+    		$$invalidate(1, maxTokens);
     	}
-
-    	const click_handler_2 = () => replaceSelectedText(responseText);
 
     	$$self.$$set = $$props => {
-    		if ('getSelectedText' in $$props) $$invalidate(0, getSelectedText = $$props.getSelectedText);
-    		if ('sendText' in $$props) $$invalidate(1, sendText = $$props.sendText);
-    		if ('replaceSelectedText' in $$props) $$invalidate(2, replaceSelectedText = $$props.replaceSelectedText);
+    		if ('openaiModels' in $$props) $$invalidate(2, openaiModels = $$props.openaiModels);
+    		if ('currentModel' in $$props) $$invalidate(0, currentModel = $$props.currentModel);
+    		if ('maxTokens' in $$props) $$invalidate(1, maxTokens = $$props.maxTokens);
     	};
 
     	$$self.$capture_state = () => ({
-    		getSelectedText,
-    		sendText,
-    		replaceSelectedText,
-    		copiedText,
-    		responseText
+    		createEventDispatcher,
+    		openaiModels,
+    		currentModel,
+    		maxTokens,
+    		dispatch,
+    		handleSelection,
+    		handleMaxTokens
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('getSelectedText' in $$props) $$invalidate(0, getSelectedText = $$props.getSelectedText);
-    		if ('sendText' in $$props) $$invalidate(1, sendText = $$props.sendText);
-    		if ('replaceSelectedText' in $$props) $$invalidate(2, replaceSelectedText = $$props.replaceSelectedText);
-    		if ('copiedText' in $$props) $$invalidate(3, copiedText = $$props.copiedText);
-    		if ('responseText' in $$props) $$invalidate(4, responseText = $$props.responseText);
+    		if ('openaiModels' in $$props) $$invalidate(2, openaiModels = $$props.openaiModels);
+    		if ('currentModel' in $$props) $$invalidate(0, currentModel = $$props.currentModel);
+    		if ('maxTokens' in $$props) $$invalidate(1, maxTokens = $$props.maxTokens);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -1630,59 +1834,56 @@ var app = (function () {
     	}
 
     	return [
-    		getSelectedText,
-    		sendText,
-    		replaceSelectedText,
-    		copiedText,
-    		responseText,
-    		click_handler,
-    		textarea0_input_handler,
-    		click_handler_1,
-    		textarea1_input_handler,
-    		click_handler_2
+    		currentModel,
+    		maxTokens,
+    		openaiModels,
+    		handleSelection,
+    		handleMaxTokens,
+    		select_change_handler,
+    		input_input_handler
     	];
     }
 
-    class Rewrite extends SvelteComponentDev {
+    class Options extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
 
     		init(this, options, instance$3, create_fragment$3, safe_not_equal, {
-    			getSelectedText: 0,
-    			sendText: 1,
-    			replaceSelectedText: 2
+    			openaiModels: 2,
+    			currentModel: 0,
+    			maxTokens: 1
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
-    			tagName: "Rewrite",
+    			tagName: "Options",
     			options,
     			id: create_fragment$3.name
     		});
     	}
 
-    	get getSelectedText() {
-    		throw new Error("<Rewrite>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	get openaiModels() {
+    		throw new Error("<Options>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set getSelectedText(value) {
-    		throw new Error("<Rewrite>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	set openaiModels(value) {
+    		throw new Error("<Options>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get sendText() {
-    		throw new Error("<Rewrite>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	get currentModel() {
+    		throw new Error("<Options>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set sendText(value) {
-    		throw new Error("<Rewrite>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	set currentModel(value) {
+    		throw new Error("<Options>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get replaceSelectedText() {
-    		throw new Error("<Rewrite>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	get maxTokens() {
+    		throw new Error("<Options>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set replaceSelectedText(value) {
-    		throw new Error("<Rewrite>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	set maxTokens(value) {
+    		throw new Error("<Options>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
 
@@ -2239,16 +2440,16 @@ var app = (function () {
 
     const { console: console_1 } = globals;
 
-    // (45:0) {#if currentView === 'Comment'}
+    // (73:0) {#if currentView === 'Comment'}
     function create_if_block_5(ctx) {
     	let comment_1;
     	let current;
 
     	comment_1 = new Comment({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[2],
-    				sendText: /*sendText*/ ctx[3],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[4]
+    				getSelectedText: /*getSelectedText*/ ctx[7],
+    				sendText: /*sendText*/ ctx[8],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[9]
     			},
     			$$inline: true
     		});
@@ -2280,23 +2481,23 @@ var app = (function () {
     		block,
     		id: create_if_block_5.name,
     		type: "if",
-    		source: "(45:0) {#if currentView === 'Comment'}",
+    		source: "(73:0) {#if currentView === 'Comment'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (48:0) {#if currentView === 'Debug'}
+    // (76:0) {#if currentView === 'Debug'}
     function create_if_block_4(ctx) {
     	let debug_1;
     	let current;
 
     	debug_1 = new Debug({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[2],
-    				sendText: /*sendText*/ ctx[3],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[4]
+    				getSelectedText: /*getSelectedText*/ ctx[7],
+    				sendText: /*sendText*/ ctx[8],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[9]
     			},
     			$$inline: true
     		});
@@ -2328,23 +2529,23 @@ var app = (function () {
     		block,
     		id: create_if_block_4.name,
     		type: "if",
-    		source: "(48:0) {#if currentView === 'Debug'}",
+    		source: "(76:0) {#if currentView === 'Debug'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (51:0) {#if currentView === 'Test'}
+    // (79:0) {#if currentView === 'Test'}
     function create_if_block_3(ctx) {
     	let test;
     	let current;
 
     	test = new Test({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[2],
-    				sendText: /*sendText*/ ctx[3],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[4]
+    				getSelectedText: /*getSelectedText*/ ctx[7],
+    				sendText: /*sendText*/ ctx[8],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[9]
     			},
     			$$inline: true
     		});
@@ -2376,23 +2577,23 @@ var app = (function () {
     		block,
     		id: create_if_block_3.name,
     		type: "if",
-    		source: "(51:0) {#if currentView === 'Test'}",
+    		source: "(79:0) {#if currentView === 'Test'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (54:0) {#if currentView === 'Optimize'}
+    // (82:0) {#if currentView === 'Optimize'}
     function create_if_block_2(ctx) {
     	let optimize;
     	let current;
 
     	optimize = new Optimize({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[2],
-    				sendText: /*sendText*/ ctx[3],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[4]
+    				getSelectedText: /*getSelectedText*/ ctx[7],
+    				sendText: /*sendText*/ ctx[8],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[9]
     			},
     			$$inline: true
     		});
@@ -2424,71 +2625,23 @@ var app = (function () {
     		block,
     		id: create_if_block_2.name,
     		type: "if",
-    		source: "(54:0) {#if currentView === 'Optimize'}",
+    		source: "(82:0) {#if currentView === 'Optimize'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (57:0) {#if currentView === 'Rewrite'}
+    // (85:0) {#if currentView === 'Clean'}
     function create_if_block_1(ctx) {
-    	let rewrite;
-    	let current;
-
-    	rewrite = new Rewrite({
-    			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[2],
-    				sendText: /*sendText*/ ctx[3],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[4]
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(rewrite.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(rewrite, target, anchor);
-    			current = true;
-    		},
-    		p: noop,
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(rewrite.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(rewrite.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(rewrite, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_1.name,
-    		type: "if",
-    		source: "(57:0) {#if currentView === 'Rewrite'}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (60:0) {#if currentView === 'Clean'}
-    function create_if_block(ctx) {
     	let clean;
     	let current;
 
     	clean = new Clean({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[2],
-    				sendText: /*sendText*/ ctx[3],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[4]
+    				getSelectedText: /*getSelectedText*/ ctx[7],
+    				sendText: /*sendText*/ ctx[8],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[9]
     			},
     			$$inline: true
     		});
@@ -2518,9 +2671,66 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
+    		id: create_if_block_1.name,
+    		type: "if",
+    		source: "(85:0) {#if currentView === 'Clean'}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (88:0) {#if currentView === 'Options'}
+    function create_if_block(ctx) {
+    	let options;
+    	let current;
+
+    	options = new Options({
+    			props: {
+    				openaiModels: /*openaiModels*/ ctx[2],
+    				currentModel: /*currentModel*/ ctx[0],
+    				maxTokens: /*maxTokens*/ ctx[1]
+    			},
+    			$$inline: true
+    		});
+
+    	options.$on("changeModel", /*changeModel*/ ctx[5]);
+    	options.$on("changeMaxTokens", /*changeMaxTokens*/ ctx[6]);
+
+    	const block = {
+    		c: function create() {
+    			create_component(options.$$.fragment);
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(options, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const options_changes = {};
+    			if (dirty & /*openaiModels*/ 4) options_changes.openaiModels = /*openaiModels*/ ctx[2];
+    			if (dirty & /*currentModel*/ 1) options_changes.currentModel = /*currentModel*/ ctx[0];
+    			if (dirty & /*maxTokens*/ 2) options_changes.maxTokens = /*maxTokens*/ ctx[1];
+    			options.$set(options_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(options.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(options.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(options, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(60:0) {#if currentView === 'Clean'}",
+    		source: "(88:0) {#if currentView === 'Options'}",
     		ctx
     	});
 
@@ -2538,13 +2748,13 @@ var app = (function () {
     	let if_block5_anchor;
     	let current;
     	nav = new Nav({ $$inline: true });
-    	nav.$on("changeView", /*changeView*/ ctx[1]);
-    	let if_block0 = /*currentView*/ ctx[0] === 'Comment' && create_if_block_5(ctx);
-    	let if_block1 = /*currentView*/ ctx[0] === 'Debug' && create_if_block_4(ctx);
-    	let if_block2 = /*currentView*/ ctx[0] === 'Test' && create_if_block_3(ctx);
-    	let if_block3 = /*currentView*/ ctx[0] === 'Optimize' && create_if_block_2(ctx);
-    	let if_block4 = /*currentView*/ ctx[0] === 'Rewrite' && create_if_block_1(ctx);
-    	let if_block5 = /*currentView*/ ctx[0] === 'Clean' && create_if_block(ctx);
+    	nav.$on("changeView", /*changeView*/ ctx[4]);
+    	let if_block0 = /*currentView*/ ctx[3] === 'Comment' && create_if_block_5(ctx);
+    	let if_block1 = /*currentView*/ ctx[3] === 'Debug' && create_if_block_4(ctx);
+    	let if_block2 = /*currentView*/ ctx[3] === 'Test' && create_if_block_3(ctx);
+    	let if_block3 = /*currentView*/ ctx[3] === 'Optimize' && create_if_block_2(ctx);
+    	let if_block4 = /*currentView*/ ctx[3] === 'Clean' && create_if_block_1(ctx);
+    	let if_block5 = /*currentView*/ ctx[3] === 'Options' && create_if_block(ctx);
 
     	const block = {
     		c: function create() {
@@ -2584,11 +2794,11 @@ var app = (function () {
     			current = true;
     		},
     		p: function update(ctx, [dirty]) {
-    			if (/*currentView*/ ctx[0] === 'Comment') {
+    			if (/*currentView*/ ctx[3] === 'Comment') {
     				if (if_block0) {
     					if_block0.p(ctx, dirty);
 
-    					if (dirty & /*currentView*/ 1) {
+    					if (dirty & /*currentView*/ 8) {
     						transition_in(if_block0, 1);
     					}
     				} else {
@@ -2607,11 +2817,11 @@ var app = (function () {
     				check_outros();
     			}
 
-    			if (/*currentView*/ ctx[0] === 'Debug') {
+    			if (/*currentView*/ ctx[3] === 'Debug') {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
 
-    					if (dirty & /*currentView*/ 1) {
+    					if (dirty & /*currentView*/ 8) {
     						transition_in(if_block1, 1);
     					}
     				} else {
@@ -2630,11 +2840,11 @@ var app = (function () {
     				check_outros();
     			}
 
-    			if (/*currentView*/ ctx[0] === 'Test') {
+    			if (/*currentView*/ ctx[3] === 'Test') {
     				if (if_block2) {
     					if_block2.p(ctx, dirty);
 
-    					if (dirty & /*currentView*/ 1) {
+    					if (dirty & /*currentView*/ 8) {
     						transition_in(if_block2, 1);
     					}
     				} else {
@@ -2653,11 +2863,11 @@ var app = (function () {
     				check_outros();
     			}
 
-    			if (/*currentView*/ ctx[0] === 'Optimize') {
+    			if (/*currentView*/ ctx[3] === 'Optimize') {
     				if (if_block3) {
     					if_block3.p(ctx, dirty);
 
-    					if (dirty & /*currentView*/ 1) {
+    					if (dirty & /*currentView*/ 8) {
     						transition_in(if_block3, 1);
     					}
     				} else {
@@ -2676,11 +2886,11 @@ var app = (function () {
     				check_outros();
     			}
 
-    			if (/*currentView*/ ctx[0] === 'Rewrite') {
+    			if (/*currentView*/ ctx[3] === 'Clean') {
     				if (if_block4) {
     					if_block4.p(ctx, dirty);
 
-    					if (dirty & /*currentView*/ 1) {
+    					if (dirty & /*currentView*/ 8) {
     						transition_in(if_block4, 1);
     					}
     				} else {
@@ -2699,11 +2909,11 @@ var app = (function () {
     				check_outros();
     			}
 
-    			if (/*currentView*/ ctx[0] === 'Clean') {
+    			if (/*currentView*/ ctx[3] === 'Options') {
     				if (if_block5) {
     					if_block5.p(ctx, dirty);
 
-    					if (dirty & /*currentView*/ 1) {
+    					if (dirty & /*currentView*/ 8) {
     						transition_in(if_block5, 1);
     					}
     				} else {
@@ -2775,11 +2985,39 @@ var app = (function () {
     function instance($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Sidebar', slots, []);
+    	let currentModel = 'gpt-3.5-turbo-1106';
+    	let maxTokens = '256';
+    	let openaiModels = [];
     	const vscode = acquireVsCodeApi();
     	let currentView = 'Comment';
+    	getApiModels();
 
-    	function changeView(view) {
-    		$$invalidate(0, currentView = view.detail);
+    	window.addEventListener('message', event => {
+    		const message = event.data;
+
+    		if (message.type === 'sendmodels') {
+    			$$invalidate(2, openaiModels = message.value);
+    		}
+    	});
+
+    	function changeView(event) {
+    		$$invalidate(3, currentView = event.detail);
+    	}
+
+    	function changeModel(event) {
+    		$$invalidate(0, currentModel = event.detail);
+    	}
+
+    	function changeMaxTokens(event) {
+    		$$invalidate(1, maxTokens = event.detail);
+    	}
+
+    	async function getApiModels() {
+    		try {
+    			await vscode.postMessage({ type: 'getmodels' });
+    		} catch(error) {
+    			console.log('Error executing command:', error);
+    		}
     	}
 
     	async function getSelectedText() {
@@ -2821,26 +3059,46 @@ var app = (function () {
     		Debug,
     		Test,
     		Optimize,
-    		Rewrite,
+    		Options,
     		Clean,
     		Comment,
+    		currentModel,
+    		maxTokens,
+    		openaiModels,
     		vscode,
     		currentView,
     		changeView,
+    		changeModel,
+    		changeMaxTokens,
+    		getApiModels,
     		getSelectedText,
     		sendText,
     		replaceSelectedText
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('currentView' in $$props) $$invalidate(0, currentView = $$props.currentView);
+    		if ('currentModel' in $$props) $$invalidate(0, currentModel = $$props.currentModel);
+    		if ('maxTokens' in $$props) $$invalidate(1, maxTokens = $$props.maxTokens);
+    		if ('openaiModels' in $$props) $$invalidate(2, openaiModels = $$props.openaiModels);
+    		if ('currentView' in $$props) $$invalidate(3, currentView = $$props.currentView);
     	};
 
     	if ($$props && "$$inject" in $$props) {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [currentView, changeView, getSelectedText, sendText, replaceSelectedText];
+    	return [
+    		currentModel,
+    		maxTokens,
+    		openaiModels,
+    		currentView,
+    		changeView,
+    		changeModel,
+    		changeMaxTokens,
+    		getSelectedText,
+    		sendText,
+    		replaceSelectedText
+    	];
     }
 
     class Sidebar extends SvelteComponentDev {

@@ -1,3 +1,4 @@
 nav.svelte-1862z36{display:flex;justify-content:space-between;align-items:center;padding:5px;background-color:#333;color:white}ul.svelte-1862z36{list-style-type:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3, 1fr);gap:5px}button.svelte-1862z36{padding:10px;cursor:pointer;width:100%}
+select.svelte-p3183o{padding:8px;margin:5px;font-size:14px;background-color:#333;color:#d4d4d4;border:1px solid #555;border-radius:4px;outline:none}select.svelte-p3183o:hover{border-color:#888}select.svelte-p3183o:focus{border-color:#4caf50}option.svelte-p3183o{background-color:#333;color:#d4d4d4}
 
 /*# sourceMappingURL=sidebar.css.map */

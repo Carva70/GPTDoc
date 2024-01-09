@@ -23,10 +23,10 @@
             <button on:click={() => setNavView('Optimize')}>Optimize</button>
         </li>
         <li>
-            <button on:click={() => setNavView('Rewrite')}>Rewrite</button>
+            <button on:click={() => setNavView('Clean')}>Clean</button>
         </li>
         <li>
-            <button on:click={() => setNavView('Clean')}>Clean</button>
+            <button on:click={() => setNavView('Options')}>Options</button>
         </li>
     </ul>
 </nav>

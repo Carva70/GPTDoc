@@ -89,3 +89,29 @@ input::placeholder,
 textarea::placeholder {
   color: var(--vscode-input-placeholderForeground);
 }
+
+/*Lo de abajo es nuevo*/
+
+select {
+  padding: var(--input-padding-vertical) var(--input-padding-horizontal);
+  margin: var(--input-margin-vertical) var(--input-margin-horizontal);
+  font-size: var(--vscode-font-size);
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  outline: none;
+}
+
+select:hover {
+  border-color: var(--vscode-focusBorder);
+}
+
+select:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+/* Styles for option elements */
+option {
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-foreground);
+}

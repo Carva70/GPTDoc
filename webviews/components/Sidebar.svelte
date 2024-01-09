@@ -4,15 +4,43 @@
     import Debug from './Debug.svelte';
     import Test from './Test.svelte';
     import Optimize from './Optimize.svelte';
-    import Rewrite from './Rewrite.svelte';
+    import Options from './Options.svelte';
     import Clean from './Clean.svelte';
     import Comment from './Comment.svelte';
 
+    let currentModel = 'gpt-3.5-turbo-1106';
+    let maxTokens = '256';
+    let openaiModels = [];
     const vscode = acquireVsCodeApi();
     let currentView = 'Comment';
 
-    function changeView(view) {
-        currentView = view.detail;
+    getApiModels();
+
+    window.addEventListener('message', (event) => {
+        const message = event.data;
+        if (message.type === 'sendmodels') {
+            openaiModels = message.value;
+        }
+    });
+
+    function changeView(event) {
+        currentView = event.detail;
+    }
+
+    function changeModel(event) {
+        currentModel = event.detail;
+    }
+
+    function changeMaxTokens(event) {
+        maxTokens = event.detail;
+    }
+
+    async function getApiModels() {
+        try {
+            await vscode.postMessage({ type: 'getmodels' });
+        } catch (error) {
+            console.log('Error executing command:', error);
+        }
     }
 
     async function getSelectedText() {
@@ -54,9 +82,15 @@
 {#if currentView === 'Optimize'}
     <Optimize {getSelectedText} {sendText} {replaceSelectedText} />
 {/if}
-{#if currentView === 'Rewrite'}
-    <Rewrite {getSelectedText} {sendText} {replaceSelectedText} />
-{/if}
 {#if currentView === 'Clean'}
     <Clean {getSelectedText} {sendText} {replaceSelectedText} />
+{/if}
+{#if currentView === 'Options'}
+    <Options
+        {openaiModels}
+        {currentModel}
+        {maxTokens}
+        on:changeModel={changeModel}
+        on:changeMaxTokens={changeMaxTokens}
+    />
 {/if}

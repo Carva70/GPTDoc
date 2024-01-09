@@ -48,6 +48,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     }
                     break;
                 }
+                case 'getmodels': {
+                    const models = await this.getModels();
+                    webviewView.webview.postMessage({
+                        type: 'sendmodels',
+                        value: models,
+                    });
+                }
                 case 'sendtext': {
                     try {
                         const responseText = await this.generatePrompt(data.value, data.view);
@@ -103,7 +110,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     '- Provide a brief comment at the beginning of the function explaining its overall purpose, including details about parameters, types, and inner variables.\n' +
                     '- Respond with only the code in text format. Do not return a markdown or any other format. Type the code directly.\n\n' +
                     'Example:\n' +
-                    'Original code:\n' +
+                    'User code:\n' +
                     'def add_numbers(a, b):\n' +
                     '    return a + b\n' +
                     'Your Response:\n' +
@@ -125,7 +132,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     '- Provide detailed comments explaining the purpose of the code, the logic behind key decisions, and any potential improvements or considerations.\n' +
                     '- Respond with only the code in text format. You will not return a markdown of any type. You will type the code directly.\n\n' +
                     'Example:\n' +
-                    'Original code:\n' +
+                    'User code:\n' +
                     'def calculate_interest(principal, rate, time):\n' +
                     '    interest = principal * rate * time / 100\n' +
                     '    total_amount = principal + interest\n' +
@@ -158,7 +165,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     '- Use the appropriate syntax for print statements in the programming language.\n' +
                     '- Do not use markdown; use only plain text format.\n\n' +
                     'Example:\n' +
-                    'Original code:\n' +
+                    'User code:\n' +
                     'def add_numbers(a, b):\n' +
                     '    return a + b\n' +
                     'Your Response:\n' +
@@ -176,11 +183,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     'You are an assistant tasked with creating test cases for the provided code. Follow these guidelines:\n' +
                     '- Write multiple test cases to ensure the code behaves as expected in different scenarios.\n' +
                     '- Include both normal and edge cases in your test suite.\n' +
-                    '- Use the syntax in the programming language of the original text.\n' +
+                    '- Use the syntax in the programming language of the user text.\n' +
                     "- In non python lenguages, dont use assert, use other type of test that doesn't require libraries.\n" +
                     '- Respond with only the code in text format. Do not return a markdown or any other format. Type the code directly.\n\n' +
                     'Example:\n' +
-                    'Original code:\n' +
+                    'User code:\n' +
                     'def add_numbers(a, b):\n' +
                     '    return a + b\n' +
                     'Your Response:\n' +
@@ -193,9 +200,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 break;
             }
             case 'Optimize': {
-                break;
-            }
-            case 'Rewrite': {
                 break;
             }
             case 'Clean': {
@@ -225,7 +229,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         systemMessage: string,
         maxTokens: number,
     ): Promise<string | null> {
-        const OPENAI_API_KEY = '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';
+        const OPENAI_API_KEY = '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';
         const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
         try {
@@ -241,11 +245,26 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 response_format: { type: 'text' },
                 max_tokens: maxTokens,
             });
-            console.log(completion.choices[0].message.content);
             return completion.choices[0].message.content;
         } catch (error) {
             console.error('Error calling OpenAI API:', error);
             throw error;
+        }
+    }
+
+    private async getModels(): Promise<string[]> {
+        const OPENAI_API_KEY = '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';
+        const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+        try {
+            const modelList = await openai.models.list();
+            console.log(modelList.data);
+            return modelList.data
+                .map((model) => model.id)
+                .filter((id) => id.includes('gpt'))
+                .sort();
+        } catch (error) {
+            console.error('Error fetching model list:', error);
+            return [];
         }
     }
 
