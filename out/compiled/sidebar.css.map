@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "file": "sidebar.css",
+  "sources": [
+    "Nav.svelte"
+  ],
+  "sourcesContent": [
+    "<script>\r\n    import { createEventDispatcher } from 'svelte';\r\n\r\n    const dispatch = createEventDispatcher();\r\n\r\n    async function setNavView(value) {\r\n        dispatch('changeView', value);\r\n    }\r\n</script>\r\n\r\n<nav>\r\n    <ul>\r\n        <li>\r\n            <button on:click={() => setNavView('Comment')}>Comment</button>\r\n        </li>\r\n        <li>\r\n            <button on:click={() => setNavView('Debug')}>Debug</button>\r\n        </li>\r\n        <li>\r\n            <button on:click={() => setNavView('Test')}>Test</button>\r\n        </li>\r\n        <li>\r\n            <button on:click={() => setNavView('Optimize')}>Optimize</button>\r\n        </li>\r\n        <li>\r\n            <button on:click={() => setNavView('Rewrite')}>Rewrite</button>\r\n        </li>\r\n        <li>\r\n            <button on:click={() => setNavView('Clean')}>Clean</button>\r\n        </li>\r\n    </ul>\r\n</nav>\r\n\r\n<style>\r\n    nav {\r\n        display: flex;\r\n        justify-content: space-between;\r\n        align-items: center;\r\n        padding: 5px;\r\n        background-color: #333;\r\n        color: white;\r\n    }\r\n\r\n    ul {\r\n        list-style-type: none;\r\n        padding: 0;\r\n        margin: 0;\r\n        display: grid;\r\n        grid-template-columns: repeat(3, 1fr);\r\n        gap: 5px;\r\n    }\r\n\r\n    button {\r\n        padding: 10px;\r\n        cursor: pointer;\r\n        width: 100%;\r\n    }\r\n</style>\r\n"
+  ],
+  "names": [],
+  "mappings": "AAkCI,kBAAI,CACA,OAAO,CAAE,IAAI,CACb,eAAe,CAAE,aAAa,CAC9B,WAAW,CAAE,MAAM,CACnB,OAAO,CAAE,GAAG,CACZ,gBAAgB,CAAE,IAAI,CACtB,KAAK,CAAE,KACX,CAEA,iBAAG,CACC,eAAe,CAAE,IAAI,CACrB,OAAO,CAAE,CAAC,CACV,MAAM,CAAE,CAAC,CACT,OAAO,CAAE,IAAI,CACb,qBAAqB,CAAE,OAAO,CAAC,CAAC,CAAC,GAAG,CAAC,CACrC,GAAG,CAAE,GACT,CAEA,qBAAO,CACH,OAAO,CAAE,IAAI,CACb,MAAM,CAAE,OAAO,CACf,KAAK,CAAE,IACX"
+}

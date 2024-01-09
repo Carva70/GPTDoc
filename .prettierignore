@@ -1,0 +1,4 @@
+# Exclude these folders from Prettier formatting
+node_modules/
+dist/
+out/

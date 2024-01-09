@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "file": "nav.css",
+  "sources": [
+    "Nav.svelte"
+  ],
+  "sourcesContent": [
+    "<nav>\r\n    <ul>\r\n        <li><button>Comment</button></li>\r\n        <li><button>Debug</button></li>\r\n        <li><button>Test</button></li>\r\n        <li><button>Optimize</button></li>\r\n        <li><button>Rewrite</button></li>\r\n        <li><button>Clean</button></li>\r\n    </ul>\r\n</nav>\r\n\r\n<style>\r\n    nav {\r\n        display: flex;\r\n        justify-content: space-between;\r\n        align-items: center;\r\n        padding: 5px;\r\n        background-color: #333;\r\n        color: white;\r\n    }\r\n\r\n    ul {\r\n        list-style-type: none;\r\n        padding: 0;\r\n        margin: 0;\r\n        display: grid;\r\n        grid-template-columns: repeat(3, 1fr); /* Adjust the number of columns as needed */\r\n        gap: 5px; /* Adjust the gap between buttons */\r\n    }\r\n\r\n    button {\r\n        padding: 10px;\r\n        cursor: pointer;\r\n        width: 100%; /* Make buttons take full width of the grid cell */\r\n    }\r\n</style>\r\n"
+  ],
+  "names": [],
+  "mappings": "AAYI,iBAAI,CACA,OAAO,CAAE,IAAI,CACb,eAAe,CAAE,aAAa,CAC9B,WAAW,CAAE,MAAM,CACnB,OAAO,CAAE,GAAG,CACZ,gBAAgB,CAAE,IAAI,CACtB,KAAK,CAAE,KACX,CAEA,gBAAG,CACC,eAAe,CAAE,IAAI,CACrB,OAAO,CAAE,CAAC,CACV,MAAM,CAAE,CAAC,CACT,OAAO,CAAE,IAAI,CACb,qBAAqB,CAAE,OAAO,CAAC,CAAC,CAAC,GAAG,CAAC,CACrC,GAAG,CAAE,GACT,CAEA,oBAAO,CACH,OAAO,CAAE,IAAI,CACb,MAAM,CAAE,OAAO,CACf,KAAK,CAAE,IACX"
+}
