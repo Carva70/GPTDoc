@@ -86,7 +86,9 @@
     "webpack-cli": "^4.2.0"
   },
   "dependencies": {
+    "chatgpt": "^5.2.5",
     "openai": "^4.24.1",
+    "ora": "^8.0.1",
     "polka": "^0.5.2",
     "supports-color": "^8.1.1"
   }

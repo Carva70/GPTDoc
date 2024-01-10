@@ -101,8 +101,16 @@ class SidebarProvider {
     _extensionUri;
     _view;
     _doc;
+    _apiKey;
+    _maxTokens;
+    _currentModel;
+    _useChat;
     constructor(_extensionUri) {
         this._extensionUri = _extensionUri;
+        this._apiKey = '';
+        this._maxTokens = 256;
+        this._currentModel = 'gpt-3.5-turbo-1106';
+        this._useChat = false;
     }
     resolveWebviewView(webviewView) {
         this._view = webviewView;
@@ -126,6 +134,22 @@ class SidebarProvider {
                         return;
                     }
                     vscode.window.showErrorMessage(data.value);
+                    break;
+                }
+                case 'onChangeModel': {
+                    this._currentModel = data.value;
+                    break;
+                }
+                case 'onChangeMaxTokens': {
+                    this._maxTokens = data.value.parseInt();
+                    break;
+                }
+                case 'onChangeApiKey': {
+                    this._apiKey = data.value;
+                    break;
+                }
+                case 'onChangeUseChat': {
+                    this._useChat = data.value;
                     break;
                 }
                 case 'gettext': {
@@ -337,7 +361,14 @@ class SidebarProvider {
         }
         console.log('systemMessage:', systemMessage);
         try {
-            const responseText = await this.openaiApiCall(prompt, systemMessage, 256);
+            let responseText = '';
+            console.log('USE CHAAAT', this._useChat);
+            if (this._useChat) {
+                responseText = await this.chatGptCall(prompt, systemMessage);
+            }
+            else {
+                responseText = await this.openaiApiCall(prompt, systemMessage);
+            }
             return responseText;
         }
         catch (error) {
@@ -345,9 +376,11 @@ class SidebarProvider {
             throw error;
         }
     }
-    async openaiApiCall(prompt, systemMessage, maxTokens) {
-        const OPENAI_API_KEY = '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';
-        const openai = new openai_1.default({ apiKey: OPENAI_API_KEY });
+    async chatGptCall(prompt, systemMessage) {
+        return 'session token not working at the moment :(';
+    }
+    async openaiApiCall(prompt, systemMessage) {
+        const openai = new openai_1.default({ apiKey: this._apiKey });
         try {
             const completion = await openai.chat.completions.create({
                 messages: [
@@ -357,9 +390,9 @@ class SidebarProvider {
                     },
                     { role: 'user', content: prompt },
                 ],
-                model: 'gpt-3.5-turbo-1106',
+                model: this._currentModel,
                 response_format: { type: 'text' },
-                max_tokens: maxTokens,
+                max_tokens: this._maxTokens,
             });
             return completion.choices[0].message.content;
         }
@@ -369,11 +402,9 @@ class SidebarProvider {
         }
     }
     async getModels() {
-        const OPENAI_API_KEY = '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';
-        const openai = new openai_1.default({ apiKey: OPENAI_API_KEY });
+        const openai = new openai_1.default({ apiKey: this._apiKey });
         try {
             const modelList = await openai.models.list();
-            console.log(modelList.data);
             return modelList.data
                 .map((model) => model.id)
                 .filter((id) => id.includes('gpt'))

@@ -1,13 +1,21 @@
 import * as vscode from 'vscode';
 import { getNonce } from './getNonce';
 import OpenAI from 'openai';
-import assert from 'assert';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
     _doc?: vscode.TextDocument;
+    _apiKey: string;
+    _maxTokens: number;
+    _currentModel: string;
+    _useChat: boolean;
 
-    constructor(private readonly _extensionUri: vscode.Uri) {}
+    constructor(private readonly _extensionUri: vscode.Uri) {
+        this._apiKey = '';
+        this._maxTokens = 256;
+        this._currentModel = 'gpt-3.5-turbo-1106';
+        this._useChat = false;
+    }
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView;
@@ -35,6 +43,22 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                         return;
                     }
                     vscode.window.showErrorMessage(data.value);
+                    break;
+                }
+                case 'onChangeModel': {
+                    this._currentModel = data.value;
+                    break;
+                }
+                case 'onChangeMaxTokens': {
+                    this._maxTokens = data.value.parseInt();
+                    break;
+                }
+                case 'onChangeApiKey': {
+                    this._apiKey = data.value;
+                    break;
+                }
+                case 'onChangeUseChat': {
+                    this._useChat = data.value;
                     break;
                 }
                 case 'gettext': {
@@ -252,11 +276,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         console.log('systemMessage:', systemMessage);
 
         try {
-            const responseText: string | null = await this.openaiApiCall(
-                prompt,
-                systemMessage,
-                256,
-            );
+            let responseText: string | null = '';
+            console.log('USE CHAAAT', this._useChat);
+            if (this._useChat) {
+                responseText = await this.chatGptCall(prompt, systemMessage);
+            } else {
+                responseText = await this.openaiApiCall(prompt, systemMessage);
+            }
             return responseText;
         } catch (error) {
             console.error('Error in transformText:', error);
@@ -264,13 +290,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         }
     }
 
-    private async openaiApiCall(
-        prompt: string,
-        systemMessage: string,
-        maxTokens: number,
-    ): Promise<string | null> {
-        const OPENAI_API_KEY = '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';
-        const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+    private async chatGptCall(prompt: string, systemMessage: string): Promise<string | null> {
+        return 'session token not working at the moment :(';
+    }
+
+    private async openaiApiCall(prompt: string, systemMessage: string): Promise<string | null> {
+        const openai = new OpenAI({ apiKey: this._apiKey });
 
         try {
             const completion = await openai.chat.completions.create({
@@ -281,9 +306,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     },
                     { role: 'user', content: prompt },
                 ],
-                model: 'gpt-3.5-turbo-1106',
+                model: this._currentModel,
                 response_format: { type: 'text' },
-                max_tokens: maxTokens,
+                max_tokens: this._maxTokens,
             });
             return completion.choices[0].message.content;
         } catch (error) {
@@ -293,11 +318,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     }
 
     private async getModels(): Promise<string[]> {
-        const OPENAI_API_KEY = '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';
-        const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+        const openai = new OpenAI({ apiKey: this._apiKey });
         try {
             const modelList = await openai.models.list();
-            console.log(modelList.data);
             return modelList.data
                 .map((model) => model.id)
                 .filter((id) => id.includes('gpt'))

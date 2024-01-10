@@ -13,6 +13,8 @@
     let openaiModels = [];
     const vscode = acquireVsCodeApi();
     let currentView = 'Comment';
+    let apiKey = '';
+    let useChat = false;
 
     getApiModels();
 
@@ -27,12 +29,42 @@
         currentView = event.detail;
     }
 
-    function changeModel(event) {
+    async function changeModel(event) {
         currentModel = event.detail;
+        try {
+            await vscode.postMessage({ type: 'onChangeModel', value: currentModel });
+        } catch (error) {
+            console.log('Error executing command:', error);
+        }
     }
 
-    function changeMaxTokens(event) {
+    async function changeMaxTokens(event) {
         maxTokens = event.detail;
+        try {
+            await vscode.postMessage({ type: 'onChangeMaxTokens', value: maxTokens });
+        } catch (error) {
+            console.log('Error executing command:', error);
+        }
+    }
+
+    async function changeApiKey(event) {
+        apiKey = event.detail;
+        try {
+            await vscode.postMessage({ type: 'onChangeApiKey', value: apiKey });
+        } catch (error) {
+            console.log('Error executing command:', error);
+        }
+        getApiModels();
+    }
+
+    async function changeUseChat(event) {
+        useChat = event.detail;
+        try {
+            await vscode.postMessage({ type: 'onChangeUseChat', value: useChat });
+        } catch (error) {
+            console.log('Error executing command:', error);
+        }
+        getApiModels();
     }
 
     async function getApiModels() {
@@ -90,7 +122,11 @@
         {openaiModels}
         {currentModel}
         {maxTokens}
+        {apiKey}
+        {useChat}
         on:changeModel={changeModel}
         on:changeMaxTokens={changeMaxTokens}
+        on:changeApiKey={changeApiKey}
+        on:changeUseChat={changeUseChat}
     />
 {/if}
