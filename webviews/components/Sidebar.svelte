@@ -7,6 +7,9 @@
     import Options from './Options.svelte';
     import Clean from './Clean.svelte';
     import Comment from './Comment.svelte';
+    import Document from './Document.svelte';
+    import Generate from './Generate.svelte';
+    import Misc from './Misc.svelte';
 
     let currentModel = 'gpt-3.5-turbo-1106';
     let maxTokens = '256';
@@ -116,6 +119,15 @@
 {/if}
 {#if currentView === 'Clean'}
     <Clean {getSelectedText} {sendText} {replaceSelectedText} />
+{/if}
+{#if currentView === 'Document'}
+    <Document {getSelectedText} {sendText} {replaceSelectedText} />
+{/if}
+{#if currentView === 'Generate'}
+    <Generate {getSelectedText} {sendText} {replaceSelectedText} />
+{/if}
+{#if currentView === 'Misc'}
+    <Misc {getSelectedText} {sendText} {replaceSelectedText} />
 {/if}
 {#if currentView === 'Options'}
     <Options

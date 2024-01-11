@@ -26,6 +26,15 @@
             <button on:click={() => setNavView('Clean')}>Clean</button>
         </li>
         <li>
+            <button on:click={() => setNavView('Document')}>Document</button>
+        </li>
+        <li>
+            <button on:click={() => setNavView('Generate')}>Generate</button>
+        </li>
+        <li>
+            <button on:click={() => setNavView('Misc')}>Misc</button>
+        </li>
+        <li>
             <button on:click={() => setNavView('Options')}>Options</button>
         </li>
     </ul>

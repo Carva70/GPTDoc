@@ -141,7 +141,7 @@ class SidebarProvider {
                     break;
                 }
                 case 'onChangeMaxTokens': {
-                    this._maxTokens = data.value.parseInt();
+                    this._maxTokens = parseInt(data.value);
                     break;
                 }
                 case 'onChangeApiKey': {
@@ -210,6 +210,7 @@ class SidebarProvider {
     async generatePrompt(selected, view) {
         const codeBegin = '<begin>';
         const codeEnd = '<end>';
+        const editor = vscode.window.activeTextEditor;
         let prompt = '';
         let systemMessage = '';
         switch (view) {
@@ -355,6 +356,74 @@ class SidebarProvider {
                         '}\n';
                 break;
             }
+            case 'Generate': {
+                if (editor) {
+                    const entireDocument = editor.document.getText();
+                    prompt = `Document:\n${entireDocument}\nGenerate:\n${selected}\n`;
+                    systemMessage =
+                        'You are an assistant tasked with generating code based on the provided prompt and the entire document. Follow these guidelines:\n' +
+                            '- Utilize the prompt to guide the generation process.\n' +
+                            '- Consider the context provided by the entire document.\n' +
+                            '- Generate code that is relevant and follows best practices.\n' +
+                            '- Respond with only the code in text format. Do not return a markdown or any other format. Type the code directly.\n\n' +
+                            '**Example**:\n' +
+                            'Document:\n' +
+                            '# Mult function\n\n' +
+                            'def mult(a, b):\n' +
+                            '    return a * b\n' +
+                            '# Exponential function using mult function\n\n' +
+                            '# Add function\n' +
+                            'def add(a, b):\n' +
+                            '    return a + b\n' +
+                            'Generate:\n' +
+                            '# Exponential function using mult function\n' +
+                            '**Your Response**:\n' +
+                            '# Exponential function using mult function\n' +
+                            'def exponential(a, b):\n' +
+                            '    result = 1\n' +
+                            '    for _ in range(b):\n' +
+                            '        result = mult(result, a)\n' +
+                            '    return result\n';
+                    break;
+                }
+                else {
+                    console.error('No active text editor found.');
+                }
+            }
+            case 'Document': {
+                prompt = selected;
+                systemMessage =
+                    'You are an assistant tasked with generating a detailed LaTeX documentation for the provided code. Follow these guidelines:\n' +
+                        '- Use LaTeX syntax to create a well-structured documentation.\n' +
+                        '- Include sections such as Introduction, Functionality, Parameters, Return Values, Usage, and Examples.\n' +
+                        '- Provide detailed explanations for each section, explaining the purpose and functionality of the code.\n' +
+                        '- Respond with only the LaTeX code in text format. Do not return a markdown or any other format. Type the LaTeX code directly.\n\n' +
+                        'Example:\n' +
+                        'User code:\n' +
+                        'function addNumbers(a, b) {\n' +
+                        '    // Adds two numbers\n' +
+                        '    return a + b;\n' +
+                        '}\n' +
+                        'Your Response:\n' +
+                        '\\section{Introduction}\n' +
+                        'This code defines a function to add two numbers.\n\n' +
+                        '\\section{Functionality}\n' +
+                        'The function takes two parameters and returns their sum.\n\n' +
+                        '\\section{Parameters}\n' +
+                        '\\begin{itemize}\n' +
+                        '\\item \\texttt{a} - The first number to be added.\n' +
+                        '\\item \\texttt{b} - The second number to be added.\n' +
+                        '\\end{itemize}\n\n' +
+                        '\\section{Return Values}\n' +
+                        'The function returns the sum of the input numbers.\n\n' +
+                        '\\section{Usage}\n' +
+                        'To use this function, call it with two numbers as arguments.\n\n' +
+                        '\\section{Examples}\n' +
+                        '\\begin{verbatim}\n' +
+                        'result = addNumbers(3, 5);\n' +
+                        '\\end{verbatim}\n';
+                break;
+            }
             default: {
                 return 'error';
             }
@@ -362,13 +431,13 @@ class SidebarProvider {
         console.log('systemMessage:', systemMessage);
         try {
             let responseText = '';
-            console.log('USE CHAAAT', this._useChat);
             if (this._useChat) {
                 responseText = await this.chatGptCall(prompt, systemMessage);
             }
             else {
                 responseText = await this.openaiApiCall(prompt, systemMessage);
             }
+            console.log(responseText);
             return responseText;
         }
         catch (error) {
