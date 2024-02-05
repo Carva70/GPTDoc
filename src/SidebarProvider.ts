@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { getNonce } from './getNonce';
 import OpenAI from 'openai';
+import Bard from 'bard-ai';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -360,7 +361,20 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     }
 
     private async chatGptCall(prompt: string, systemMessage: string): Promise<string | null> {
-        return 'session token not working at the moment :(';
+        let myBard = new Bard(this._apiKey);
+
+        let response = await myBard.ask(systemMessage + '\nUser code:\n' + prompt);
+
+        if (typeof response === 'string') {
+            return this.removeMarkdownFormat(response);
+        } else {
+            return null;
+        }
+    }
+
+    private removeMarkdownFormat(input: string): string {
+        const regex = /```[a-zA-Z]*\n([\s\S]*?)\n```/;
+        return input.replace(regex, '$1');
     }
 
     private async openaiApiCall(prompt: string, systemMessage: string): Promise<string | null> {

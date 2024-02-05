@@ -1,95 +1,95 @@
 {
-  "name": "gptdoc",
-  "displayName": "gptdoc",
-  "description": "Generate documentation with AI",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.85.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [],
-  "main": "./dist/extension.js",
-  "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "gptdoc-sidebar-view",
-          "title": "GPTDoc",
-          "icon": "media/checklist.svg"
-        }
-      ]
+    "name": "gptdoc",
+    "displayName": "gptdoc",
+    "description": "Generate documentation with AI",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.85.0"
     },
-    "views": {
-      "gptdoc-sidebar-view": [
-        {
-          "type": "webview",
-          "id": "gptdoc-sidebar",
-          "name": "GPTDoc",
-          "icon": "media/checklist.svg",
-          "contextualTitle": "GPTDoc"
-        }
-      ]
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "gptdoc-sidebar-view",
+                    "title": "GPTDoc",
+                    "icon": "media/checklist.svg"
+                }
+            ]
+        },
+        "views": {
+            "gptdoc-sidebar-view": [
+                {
+                    "type": "webview",
+                    "id": "gptdoc-sidebar",
+                    "name": "GPTDoc",
+                    "icon": "media/checklist.svg",
+                    "contextualTitle": "GPTDoc"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "gptdoc.helloWorld",
+                "category": "GPTDoc",
+                "title": "Hello World"
+            },
+            {
+                "command": "gptdoc.getSelectedText",
+                "category": "GPTDoc",
+                "title": "Get Selected Text"
+            }
+        ]
     },
-    "commands": [
-      {
-        "command": "gptdoc.helloWorld",
-        "category": "GPTDoc",
-        "title": "Hello World"
-      },
-      {
-        "command": "gptdoc.getSelectedText",
-        "category": "GPTDoc",
-        "title": "Get Selected Text"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "webpack",
-    "watch": "concurrently \"rollup -c -w\" \"webpack --watch\"",
-    "package": "webpack --mode production --devtool hidden-source-map",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.1",
-    "@rollup/plugin-typescript": "^8.1.0",
-    "@tsconfig/svelte": "^1.0.10",
-    "@types/glob": "^7.1.3",
-    "@types/mocha": "^8.0.4",
-    "@types/node": "^12.11.7",
-    "@types/polka": "^0.5.1",
-    "@types/vscode": "^1.52.0",
-    "@typescript-eslint/eslint-plugin": "^4.9.0",
-    "@typescript-eslint/parser": "^4.9.0",
-    "concurrently": "^5.3.0",
-    "eslint": "^7.15.0",
-    "glob": "^7.1.6",
-    "mocha": "^8.1.3",
-    "prettier": "^3.1.1",
-    "rollup": "^2.3.4",
-    "rollup-plugin-svelte": "^6.0.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "svelte": "^3.31.0",
-    "svelte-check": "^1.1.23",
-    "svelte-preprocess": "^4.6.1",
-    "ts-loader": "^8.0.11",
-    "typescript": "^4.1.2",
-    "vscode-test": "^1.4.1",
-    "webpack": "^5.10.0",
-    "webpack-cli": "^4.2.0"
-  },
-  "dependencies": {
-    "chatgpt": "^5.2.5",
-    "openai": "^4.24.1",
-    "ora": "^8.0.1",
-    "polka": "^0.5.2",
-    "supports-color": "^8.1.1"
-  }
+    "scripts": {
+        "vscode:prepublish": "npm run package",
+        "compile": "webpack",
+        "watch": "concurrently \"rollup -c -w\" \"webpack --watch\"",
+        "package": "webpack --mode production --devtool hidden-source-map",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "npm run compile-tests && npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^17.0.0",
+        "@rollup/plugin-node-resolve": "^11.0.1",
+        "@rollup/plugin-typescript": "^8.1.0",
+        "@tsconfig/svelte": "^1.0.10",
+        "@types/glob": "^7.1.3",
+        "@types/mocha": "^8.0.4",
+        "@types/node": "^12.11.7",
+        "@types/polka": "^0.5.1",
+        "@types/vscode": "^1.52.0",
+        "@typescript-eslint/eslint-plugin": "^4.9.0",
+        "@typescript-eslint/parser": "^4.9.0",
+        "concurrently": "^5.3.0",
+        "eslint": "^7.15.0",
+        "glob": "^7.1.6",
+        "mocha": "^8.1.3",
+        "prettier": "^3.1.1",
+        "rollup": "^2.3.4",
+        "rollup-plugin-svelte": "^6.0.0",
+        "rollup-plugin-terser": "^7.0.2",
+        "svelte": "^3.31.0",
+        "svelte-check": "^1.1.23",
+        "svelte-preprocess": "^4.6.1",
+        "ts-loader": "^8.0.11",
+        "typescript": "^4.1.2",
+        "vscode-test": "^1.4.1",
+        "webpack": "^5.10.0",
+        "webpack-cli": "^4.2.0"
+    },
+    "dependencies": {
+        "bard-ai": "^2.0.3",
+        "openai": "^4.24.1",
+        "ora": "^8.0.1",
+        "polka": "^0.5.2",
+        "supports-color": "^8.1.1"
+    }
 }
