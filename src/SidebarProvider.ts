@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { getNonce } from './getNonce';
 import OpenAI from 'openai';
 import Bard from 'bard-ai';
+import axios from 'axios';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView;
@@ -10,12 +11,14 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     _maxTokens: number;
     _currentModel: string;
     _useChat: boolean;
+    _useLocalApi: boolean;
 
     constructor(private readonly _extensionUri: vscode.Uri) {
         this._apiKey = '';
         this._maxTokens = 256;
         this._currentModel = 'gpt-3.5-turbo-1106';
         this._useChat = false;
+        this._useLocalApi = false;
     }
 
     public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -62,6 +65,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     this._useChat = data.value;
                     break;
                 }
+                case 'onChangeUseLocalApi': {
+                    this._useLocalApi = data.value;
+                    break;
+                }
                 case 'gettext': {
                     const editor = vscode.window.activeTextEditor;
                     if (editor) {
@@ -82,7 +89,24 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 }
                 case 'sendtext': {
                     try {
-                        const responseText = await this.generatePrompt(data.value, data.view);
+                        let responseText = await this.generatePrompt(data.value, data.view);
+                        if (data.view == 'Uml') {
+                            const { geturl } = require('./plantuml.js');
+                            if (responseText !== null) {
+                                const isCodeBlock = responseText.startsWith('```');
+
+                                const noMdResponse = isCodeBlock
+                                    ? responseText.split('\n').slice(1, -1).join('\n')
+                                    : responseText;
+
+                                responseText = noMdResponse;
+                            }
+                            const responseImage = geturl(responseText);
+                            webviewView.webview.postMessage({
+                                type: 'responseImage',
+                                value: responseImage,
+                            });
+                        }
                         webviewView.webview.postMessage({
                             type: 'responseText',
                             value: responseText,
@@ -339,6 +363,49 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     '\\end{verbatim}\n';
                 break;
             }
+            case 'Uml': {
+                if (editor) {
+                    const code = editor.document.getText();
+                    prompt = `Code:\n${code}\n`;
+
+                    systemMessage =
+                        'You are an assistant tasked with generating a comprehensive UML diagram from the provided code. The code represents a system with various classes and relationships. Follow these guidelines:\n' +
+                        '- Use PlantUML syntax to describe the UML elements based on the provided code.\n' +
+                        '- Carefully go through the code and identify classes in the first step. List all the classes with their attributes and methods in the PlantUML syntax.\n' +
+                        '- In the second step, focus on relationships. For each class, identify and represent the correct inheritance (<|--), realization/implementation, composition (*--), aggregation (o--), association, or dependency in PlantUML syntax.\n' +
+                        '- In the third step, ensure that there are no repeated relations and optimize the UML diagram for clarity.\n' +
+                        '- Pay attention to details, such as multiplicity and role names in associations.\n' +
+                        '- Respond only with the generated PlantUML code in the @startuml //plantuml @enduml format, no explanation.\n\n' +
+                        'Code Snippet:\n' +
+                        '```java\n' +
+                        '// Insert relevant code snippet here\n' +
+                        '```\n\n' +
+                        'Your Response:\n' +
+                        '@startuml\n' +
+                        'class ClassA {\n' +
+                        '    - attribute1: DataType\n' +
+                        '    + method1(): ReturnType\n' +
+                        '}\n\n' +
+                        'class ClassB {\n' +
+                        '    # attribute2: DataType\n' +
+                        '    - method2(param: ParameterType): ReturnType\n' +
+                        '}\n\n' +
+                        'class ClassC {\n' +
+                        '    * attribute3: DataType\n' +
+                        '    {static} + method3(): ReturnType\n' +
+                        '}\n\n' +
+                        'ClassA <|-- ClassB\n' +
+                        'ClassB <|.. ClassC\n' +
+                        'ClassA "1" o-- "*" ClassC : Contains\n' +
+                        'ClassA "1" *-- "*" ClassB : Manages\n' +
+                        'ClassA "*" -- "*" ClassB : Has\n' +
+                        '@enduml\n';
+
+                    break;
+                } else {
+                    console.error('No active text editor found.');
+                }
+            }
             default: {
                 return 'error';
             }
@@ -347,16 +414,51 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         try {
             let responseText: string | null = '';
-            if (this._useChat) {
-                responseText = await this.chatGptCall(prompt, systemMessage);
+            if (this._useLocalApi) {
+                responseText = await this.localCall(prompt, systemMessage);
             } else {
-                responseText = await this.openaiApiCall(prompt, systemMessage);
+                if (this._useChat) {
+                    responseText = await this.chatGptCall(prompt, systemMessage);
+                } else {
+                    responseText = await this.openaiApiCall(prompt, systemMessage);
+                }
             }
+
             console.log(responseText);
             return responseText;
         } catch (error) {
             console.error('Error in transformText:', error);
             throw error;
+        }
+    }
+
+    private async localCall(prompt: string, systemMessage: string): Promise<string | null> {
+        const url = 'http://localhost:5000/run_simulation';
+
+        const data = {
+            system_message: systemMessage,
+            user_message: prompt,
+            max_seq_len: 5000,
+        };
+
+        try {
+            console.log('Sending...');
+            const response = await axios.post(url, data);
+
+            if (response.status === 200) {
+                let result = response.data.result || '';
+                result = result.split('\n').slice(4).join('\n');
+                console.log('Simulation Result:');
+                console.log(result);
+                return result;
+            } else {
+                const errorMessage = response.data.error || '';
+                console.log(`Error: ${errorMessage}`);
+                return null;
+            }
+        } catch (error) {
+            console.error('An error occurred:', error);
+            return null;
         }
     }
 

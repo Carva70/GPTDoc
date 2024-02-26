@@ -6,6 +6,8 @@
     export let maxTokens;
     export let apiKey;
     export let useChat;
+    export let useLocalApi;
+
     const dispatch = createEventDispatcher();
 
     function handleSelection(event) {
@@ -27,9 +29,19 @@
         useChat = event.target.checked;
         dispatch('changeUseChat', useChat);
     }
+
+    function handleUseLocalApi(event) {
+        useLocalApi = event.target.checked;
+        dispatch('changeUseLocalApi', useLocalApi);
+    }
 </script>
 
 <h1>Options</h1>
+
+<label>
+    Use Local LLM:
+    <input bind:checked={useLocalApi} type="checkbox" on:change={handleUseLocalApi} />
+</label>
 
 <label>
     Use ChatGPT (requires session key):

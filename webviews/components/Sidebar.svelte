@@ -18,6 +18,7 @@
     let currentView = 'Comment';
     let apiKey = '';
     let useChat = false;
+    let useLocalApi = false;
 
     getApiModels();
 
@@ -68,6 +69,15 @@
             console.log('Error executing command:', error);
         }
         getApiModels();
+    }
+
+    async function changeUseLocalApi(event) {
+        useLocalApi = event.detail;
+        try {
+            await vscode.postMessage({ type: 'onChangeUseLocalApi', value: useLocalApi });
+        } catch (error) {
+            console.log('Error executing command:', error);
+        }
     }
 
     async function getApiModels() {
@@ -127,7 +137,7 @@
     <Generate {getSelectedText} {sendText} {replaceSelectedText} />
 {/if}
 {#if currentView === 'Misc'}
-    <Misc {getSelectedText} {sendText} {replaceSelectedText} />
+    <Misc {sendText} />
 {/if}
 {#if currentView === 'Options'}
     <Options
@@ -136,9 +146,11 @@
         {maxTokens}
         {apiKey}
         {useChat}
+        {useLocalApi}
         on:changeModel={changeModel}
         on:changeMaxTokens={changeMaxTokens}
         on:changeApiKey={changeApiKey}
         on:changeUseChat={changeUseChat}
+        on:changeUseLocalApi={changeUseLocalApi}
     />
 {/if}

@@ -22,6 +22,14 @@ var app = (function () {
     function safe_not_equal(a, b) {
         return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
     }
+    let src_url_equal_anchor;
+    function src_url_equal(element_src, url) {
+        if (!src_url_equal_anchor) {
+            src_url_equal_anchor = document.createElement('a');
+        }
+        src_url_equal_anchor.href = url;
+        return element_src === src_url_equal_anchor.href;
+    }
     function is_empty(obj) {
         return Object.keys(obj).length === 0;
     }
@@ -1613,11 +1621,11 @@ var app = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[14] = list[i];
+    	child_ctx[17] = list[i];
     	return child_ctx;
     }
 
-    // (42:4) {:else}
+    // (54:4) {:else}
     function create_else_block(ctx) {
     	let t;
 
@@ -1637,14 +1645,14 @@ var app = (function () {
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(42:4) {:else}",
+    		source: "(54:4) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (40:4) {#if useChat}
+    // (52:4) {#if useChat}
     function create_if_block_1$1(ctx) {
     	let t;
 
@@ -1664,15 +1672,15 @@ var app = (function () {
     		block,
     		id: create_if_block_1$1.name,
     		type: "if",
-    		source: "(40:4) {#if useChat}",
+    		source: "(52:4) {#if useChat}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (49:0) {#if !useChat}
-    function create_if_block$1(ctx) {
+    // (61:0) {#if !useChat}
+    function create_if_block$2(ctx) {
     	let label;
     	let t;
     	let select;
@@ -1680,9 +1688,9 @@ var app = (function () {
     	let each_1_lookup = new Map();
     	let mounted;
     	let dispose;
-    	let each_value = /*openaiModels*/ ctx[4];
+    	let each_value = /*openaiModels*/ ctx[5];
     	validate_each_argument(each_value);
-    	const get_key = ctx => /*model*/ ctx[14];
+    	const get_key = ctx => /*model*/ ctx[17];
     	validate_each_keys(ctx, each_value, get_each_context, get_key);
 
     	for (let i = 0; i < each_value.length; i += 1) {
@@ -1701,10 +1709,10 @@ var app = (function () {
     				each_blocks[i].c();
     			}
 
-    			if (/*currentModel*/ ctx[0] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[11].call(select));
-    			add_location(select, file$5, 51, 8, 1209);
+    			if (/*currentModel*/ ctx[0] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[14].call(select));
+    			add_location(select, file$5, 63, 8, 1517);
     			attr_dev(label, "class", "svelte-1guvdyr");
-    			add_location(label, file$5, 49, 4, 1169);
+    			add_location(label, file$5, 61, 4, 1477);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, label, anchor);
@@ -1721,22 +1729,22 @@ var app = (function () {
 
     			if (!mounted) {
     				dispose = [
-    					listen_dev(select, "change", /*select_change_handler*/ ctx[11]),
-    					listen_dev(select, "change", /*handleSelection*/ ctx[5], false, false, false, false)
+    					listen_dev(select, "change", /*select_change_handler*/ ctx[14]),
+    					listen_dev(select, "change", /*handleSelection*/ ctx[6], false, false, false, false)
     				];
 
     				mounted = true;
     			}
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*openaiModels*/ 16) {
-    				each_value = /*openaiModels*/ ctx[4];
+    			if (dirty & /*openaiModels*/ 32) {
+    				each_value = /*openaiModels*/ ctx[5];
     				validate_each_argument(each_value);
     				validate_each_keys(ctx, each_value, get_each_context, get_key);
     				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, select, destroy_block, create_each_block, null, get_each_context);
     			}
 
-    			if (dirty & /*currentModel, openaiModels*/ 17) {
+    			if (dirty & /*currentModel, openaiModels*/ 33) {
     				select_option(select, /*currentModel*/ ctx[0]);
     			}
     		},
@@ -1754,19 +1762,19 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$1.name,
+    		id: create_if_block$2.name,
     		type: "if",
-    		source: "(49:0) {#if !useChat}",
+    		source: "(61:0) {#if !useChat}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (53:12) {#each openaiModels as model (model)}
+    // (65:12) {#each openaiModels as model (model)}
     function create_each_block(key_1, ctx) {
     	let option;
-    	let t_value = /*model*/ ctx[14] + "";
+    	let t_value = /*model*/ ctx[17] + "";
     	let t;
     	let option_value_value;
 
@@ -1776,9 +1784,9 @@ var app = (function () {
     		c: function create() {
     			option = element("option");
     			t = text(t_value);
-    			option.__value = option_value_value = /*model*/ ctx[14];
+    			option.__value = option_value_value = /*model*/ ctx[17];
     			option.value = option.__value;
-    			add_location(option, file$5, 53, 16, 1340);
+    			add_location(option, file$5, 65, 16, 1648);
     			this.first = option;
     		},
     		m: function mount(target, anchor) {
@@ -1787,9 +1795,9 @@ var app = (function () {
     		},
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
-    			if (dirty & /*openaiModels*/ 16 && t_value !== (t_value = /*model*/ ctx[14] + "")) set_data_dev(t, t_value);
+    			if (dirty & /*openaiModels*/ 32 && t_value !== (t_value = /*model*/ ctx[17] + "")) set_data_dev(t, t_value);
 
-    			if (dirty & /*openaiModels*/ 16 && option_value_value !== (option_value_value = /*model*/ ctx[14])) {
+    			if (dirty & /*openaiModels*/ 32 && option_value_value !== (option_value_value = /*model*/ ctx[17])) {
     				prop_dev(option, "__value", option_value_value);
     				option.value = option.__value;
     			}
@@ -1803,7 +1811,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(53:12) {#each openaiModels as model (model)}",
+    		source: "(65:12) {#each openaiModels as model (model)}",
     		ctx
     	});
 
@@ -1821,10 +1829,14 @@ var app = (function () {
     	let t4;
     	let input1;
     	let t5;
-    	let t6;
     	let label2;
-    	let t7;
+    	let t6;
     	let input2;
+    	let t7;
+    	let t8;
+    	let label3;
+    	let t9;
+    	let input3;
     	let mounted;
     	let dispose;
 
@@ -1835,7 +1847,7 @@ var app = (function () {
 
     	let current_block_type = select_block_type(ctx);
     	let if_block0 = current_block_type(ctx);
-    	let if_block1 = !/*useChat*/ ctx[3] && create_if_block$1(ctx);
+    	let if_block1 = !/*useChat*/ ctx[3] && create_if_block$2(ctx);
 
     	const block = {
     		c: function create() {
@@ -1843,32 +1855,40 @@ var app = (function () {
     			h1.textContent = "Options";
     			t1 = space();
     			label0 = element("label");
-    			t2 = text("Use ChatGPT (requires session key):\r\n    ");
+    			t2 = text("Use Local LLM:\r\n    ");
     			input0 = element("input");
     			t3 = space();
     			label1 = element("label");
-    			if_block0.c();
-    			t4 = space();
+    			t4 = text("Use ChatGPT (requires session key):\r\n    ");
     			input1 = element("input");
     			t5 = space();
-    			if (if_block1) if_block1.c();
-    			t6 = space();
     			label2 = element("label");
-    			t7 = text("Max token response:\r\n    ");
+    			if_block0.c();
+    			t6 = space();
     			input2 = element("input");
-    			add_location(h1, file$5, 31, 0, 797);
+    			t7 = space();
+    			if (if_block1) if_block1.c();
+    			t8 = space();
+    			label3 = element("label");
+    			t9 = text("Max token response:\r\n    ");
+    			input3 = element("input");
+    			add_location(h1, file$5, 38, 0, 976);
     			attr_dev(input0, "type", "checkbox");
-    			add_location(input0, file$5, 35, 4, 871);
+    			add_location(input0, file$5, 42, 4, 1029);
     			attr_dev(label0, "class", "svelte-1guvdyr");
-    			add_location(label0, file$5, 33, 0, 817);
-    			attr_dev(input1, "type", "password");
-    			add_location(input1, file$5, 45, 4, 1065);
+    			add_location(label0, file$5, 40, 0, 996);
+    			attr_dev(input1, "type", "checkbox");
+    			add_location(input1, file$5, 47, 4, 1179);
     			attr_dev(label1, "class", "svelte-1guvdyr");
-    			add_location(label1, file$5, 38, 0, 959);
-    			attr_dev(input2, "type", "number");
-    			add_location(input2, file$5, 61, 4, 1481);
+    			add_location(label1, file$5, 45, 0, 1125);
+    			attr_dev(input2, "type", "password");
+    			add_location(input2, file$5, 57, 4, 1373);
     			attr_dev(label2, "class", "svelte-1guvdyr");
-    			add_location(label2, file$5, 59, 0, 1443);
+    			add_location(label2, file$5, 50, 0, 1267);
+    			attr_dev(input3, "type", "number");
+    			add_location(input3, file$5, 73, 4, 1789);
+    			attr_dev(label3, "class", "svelte-1guvdyr");
+    			add_location(label3, file$5, 71, 0, 1751);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1879,37 +1899,48 @@ var app = (function () {
     			insert_dev(target, label0, anchor);
     			append_dev(label0, t2);
     			append_dev(label0, input0);
-    			input0.checked = /*useChat*/ ctx[3];
+    			input0.checked = /*useLocalApi*/ ctx[4];
     			insert_dev(target, t3, anchor);
     			insert_dev(target, label1, anchor);
-    			if_block0.m(label1, null);
     			append_dev(label1, t4);
     			append_dev(label1, input1);
-    			set_input_value(input1, /*apiKey*/ ctx[2]);
+    			input1.checked = /*useChat*/ ctx[3];
     			insert_dev(target, t5, anchor);
-    			if (if_block1) if_block1.m(target, anchor);
-    			insert_dev(target, t6, anchor);
     			insert_dev(target, label2, anchor);
-    			append_dev(label2, t7);
+    			if_block0.m(label2, null);
+    			append_dev(label2, t6);
     			append_dev(label2, input2);
-    			set_input_value(input2, /*maxTokens*/ ctx[1]);
+    			set_input_value(input2, /*apiKey*/ ctx[2]);
+    			insert_dev(target, t7, anchor);
+    			if (if_block1) if_block1.m(target, anchor);
+    			insert_dev(target, t8, anchor);
+    			insert_dev(target, label3, anchor);
+    			append_dev(label3, t9);
+    			append_dev(label3, input3);
+    			set_input_value(input3, /*maxTokens*/ ctx[1]);
 
     			if (!mounted) {
     				dispose = [
-    					listen_dev(input0, "change", /*input0_change_handler*/ ctx[9]),
-    					listen_dev(input0, "change", /*handleUseChat*/ ctx[8], false, false, false, false),
-    					listen_dev(input1, "input", /*input1_input_handler*/ ctx[10]),
-    					listen_dev(input1, "change", /*handleApiKey*/ ctx[7], false, false, false, false),
-    					listen_dev(input2, "input", /*input2_input_handler*/ ctx[12]),
-    					listen_dev(input2, "change", /*handleMaxTokens*/ ctx[6], false, false, false, false)
+    					listen_dev(input0, "change", /*input0_change_handler*/ ctx[11]),
+    					listen_dev(input0, "change", /*handleUseLocalApi*/ ctx[10], false, false, false, false),
+    					listen_dev(input1, "change", /*input1_change_handler*/ ctx[12]),
+    					listen_dev(input1, "change", /*handleUseChat*/ ctx[9], false, false, false, false),
+    					listen_dev(input2, "input", /*input2_input_handler*/ ctx[13]),
+    					listen_dev(input2, "change", /*handleApiKey*/ ctx[8], false, false, false, false),
+    					listen_dev(input3, "input", /*input3_input_handler*/ ctx[15]),
+    					listen_dev(input3, "change", /*handleMaxTokens*/ ctx[7], false, false, false, false)
     				];
 
     				mounted = true;
     			}
     		},
     		p: function update(ctx, [dirty]) {
+    			if (dirty & /*useLocalApi*/ 16) {
+    				input0.checked = /*useLocalApi*/ ctx[4];
+    			}
+
     			if (dirty & /*useChat*/ 8) {
-    				input0.checked = /*useChat*/ ctx[3];
+    				input1.checked = /*useChat*/ ctx[3];
     			}
 
     			if (current_block_type !== (current_block_type = select_block_type(ctx))) {
@@ -1918,29 +1949,29 @@ var app = (function () {
 
     				if (if_block0) {
     					if_block0.c();
-    					if_block0.m(label1, t4);
+    					if_block0.m(label2, t6);
     				}
     			}
 
-    			if (dirty & /*apiKey*/ 4 && input1.value !== /*apiKey*/ ctx[2]) {
-    				set_input_value(input1, /*apiKey*/ ctx[2]);
+    			if (dirty & /*apiKey*/ 4 && input2.value !== /*apiKey*/ ctx[2]) {
+    				set_input_value(input2, /*apiKey*/ ctx[2]);
     			}
 
     			if (!/*useChat*/ ctx[3]) {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
     				} else {
-    					if_block1 = create_if_block$1(ctx);
+    					if_block1 = create_if_block$2(ctx);
     					if_block1.c();
-    					if_block1.m(t6.parentNode, t6);
+    					if_block1.m(t8.parentNode, t8);
     				}
     			} else if (if_block1) {
     				if_block1.d(1);
     				if_block1 = null;
     			}
 
-    			if (dirty & /*maxTokens*/ 2 && to_number(input2.value) !== /*maxTokens*/ ctx[1]) {
-    				set_input_value(input2, /*maxTokens*/ ctx[1]);
+    			if (dirty & /*maxTokens*/ 2 && to_number(input3.value) !== /*maxTokens*/ ctx[1]) {
+    				set_input_value(input3, /*maxTokens*/ ctx[1]);
     			}
     		},
     		i: noop,
@@ -1951,11 +1982,13 @@ var app = (function () {
     			if (detaching) detach_dev(label0);
     			if (detaching) detach_dev(t3);
     			if (detaching) detach_dev(label1);
-    			if_block0.d();
     			if (detaching) detach_dev(t5);
-    			if (if_block1) if_block1.d(detaching);
-    			if (detaching) detach_dev(t6);
     			if (detaching) detach_dev(label2);
+    			if_block0.d();
+    			if (detaching) detach_dev(t7);
+    			if (if_block1) if_block1.d(detaching);
+    			if (detaching) detach_dev(t8);
+    			if (detaching) detach_dev(label3);
     			mounted = false;
     			run_all(dispose);
     		}
@@ -1980,6 +2013,7 @@ var app = (function () {
     	let { maxTokens } = $$props;
     	let { apiKey } = $$props;
     	let { useChat } = $$props;
+    	let { useLocalApi } = $$props;
     	const dispatch = createEventDispatcher();
 
     	function handleSelection(event) {
@@ -2002,6 +2036,11 @@ var app = (function () {
     		dispatch('changeUseChat', useChat);
     	}
 
+    	function handleUseLocalApi(event) {
+    		$$invalidate(4, useLocalApi = event.target.checked);
+    		dispatch('changeUseLocalApi', useLocalApi);
+    	}
+
     	$$self.$$.on_mount.push(function () {
     		if (openaiModels === undefined && !('openaiModels' in $$props || $$self.$$.bound[$$self.$$.props['openaiModels']])) {
     			console.warn("<Options> was created without expected prop 'openaiModels'");
@@ -2022,20 +2061,36 @@ var app = (function () {
     		if (useChat === undefined && !('useChat' in $$props || $$self.$$.bound[$$self.$$.props['useChat']])) {
     			console.warn("<Options> was created without expected prop 'useChat'");
     		}
+
+    		if (useLocalApi === undefined && !('useLocalApi' in $$props || $$self.$$.bound[$$self.$$.props['useLocalApi']])) {
+    			console.warn("<Options> was created without expected prop 'useLocalApi'");
+    		}
     	});
 
-    	const writable_props = ['openaiModels', 'currentModel', 'maxTokens', 'apiKey', 'useChat'];
+    	const writable_props = [
+    		'openaiModels',
+    		'currentModel',
+    		'maxTokens',
+    		'apiKey',
+    		'useChat',
+    		'useLocalApi'
+    	];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Options> was created with unknown prop '${key}'`);
     	});
 
     	function input0_change_handler() {
+    		useLocalApi = this.checked;
+    		$$invalidate(4, useLocalApi);
+    	}
+
+    	function input1_change_handler() {
     		useChat = this.checked;
     		$$invalidate(3, useChat);
     	}
 
-    	function input1_input_handler() {
+    	function input2_input_handler() {
     		apiKey = this.value;
     		$$invalidate(2, apiKey);
     	}
@@ -2043,20 +2098,21 @@ var app = (function () {
     	function select_change_handler() {
     		currentModel = select_value(this);
     		$$invalidate(0, currentModel);
-    		$$invalidate(4, openaiModels);
+    		$$invalidate(5, openaiModels);
     	}
 
-    	function input2_input_handler() {
+    	function input3_input_handler() {
     		maxTokens = to_number(this.value);
     		$$invalidate(1, maxTokens);
     	}
 
     	$$self.$$set = $$props => {
-    		if ('openaiModels' in $$props) $$invalidate(4, openaiModels = $$props.openaiModels);
+    		if ('openaiModels' in $$props) $$invalidate(5, openaiModels = $$props.openaiModels);
     		if ('currentModel' in $$props) $$invalidate(0, currentModel = $$props.currentModel);
     		if ('maxTokens' in $$props) $$invalidate(1, maxTokens = $$props.maxTokens);
     		if ('apiKey' in $$props) $$invalidate(2, apiKey = $$props.apiKey);
     		if ('useChat' in $$props) $$invalidate(3, useChat = $$props.useChat);
+    		if ('useLocalApi' in $$props) $$invalidate(4, useLocalApi = $$props.useLocalApi);
     	};
 
     	$$self.$capture_state = () => ({
@@ -2066,19 +2122,22 @@ var app = (function () {
     		maxTokens,
     		apiKey,
     		useChat,
+    		useLocalApi,
     		dispatch,
     		handleSelection,
     		handleMaxTokens,
     		handleApiKey,
-    		handleUseChat
+    		handleUseChat,
+    		handleUseLocalApi
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('openaiModels' in $$props) $$invalidate(4, openaiModels = $$props.openaiModels);
+    		if ('openaiModels' in $$props) $$invalidate(5, openaiModels = $$props.openaiModels);
     		if ('currentModel' in $$props) $$invalidate(0, currentModel = $$props.currentModel);
     		if ('maxTokens' in $$props) $$invalidate(1, maxTokens = $$props.maxTokens);
     		if ('apiKey' in $$props) $$invalidate(2, apiKey = $$props.apiKey);
     		if ('useChat' in $$props) $$invalidate(3, useChat = $$props.useChat);
+    		if ('useLocalApi' in $$props) $$invalidate(4, useLocalApi = $$props.useLocalApi);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -2090,15 +2149,18 @@ var app = (function () {
     		maxTokens,
     		apiKey,
     		useChat,
+    		useLocalApi,
     		openaiModels,
     		handleSelection,
     		handleMaxTokens,
     		handleApiKey,
     		handleUseChat,
+    		handleUseLocalApi,
     		input0_change_handler,
-    		input1_input_handler,
+    		input1_change_handler,
+    		input2_input_handler,
     		select_change_handler,
-    		input2_input_handler
+    		input3_input_handler
     	];
     }
 
@@ -2107,11 +2169,12 @@ var app = (function () {
     		super(options);
 
     		init(this, options, instance$6, create_fragment$6, safe_not_equal, {
-    			openaiModels: 4,
+    			openaiModels: 5,
     			currentModel: 0,
     			maxTokens: 1,
     			apiKey: 2,
-    			useChat: 3
+    			useChat: 3,
+    			useLocalApi: 4
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -2159,6 +2222,14 @@ var app = (function () {
     	}
 
     	set useChat(value) {
+    		throw new Error("<Options>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get useLocalApi() {
+    		throw new Error("<Options>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set useLocalApi(value) {
     		throw new Error("<Options>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
@@ -3232,26 +3303,129 @@ var app = (function () {
 
     const file = "webviews\\components\\Misc.svelte";
 
+    // (26:0) {#if responseImage}
+    function create_if_block$1(ctx) {
+    	let img;
+    	let img_src_value;
+
+    	const block = {
+    		c: function create() {
+    			img = element("img");
+    			if (!src_url_equal(img.src, img_src_value = /*responseImage*/ ctx[2])) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "");
+    			set_style(img, "max-width", "100%");
+    			set_style(img, "height", "auto");
+    			add_location(img, file, 26, 4, 737);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, img, anchor);
+    		},
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*responseImage*/ 4 && !src_url_equal(img.src, img_src_value = /*responseImage*/ ctx[2])) {
+    				attr_dev(img, "src", img_src_value);
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(img);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block$1.name,
+    		type: "if",
+    		source: "(26:0) {#if responseImage}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
     function create_fragment$1(ctx) {
     	let h1;
+    	let t1;
+    	let button;
+    	let t3;
+    	let textarea;
+    	let t4;
+    	let if_block_anchor;
+    	let mounted;
+    	let dispose;
+    	let if_block = /*responseImage*/ ctx[2] && create_if_block$1(ctx);
 
     	const block = {
     		c: function create() {
     			h1 = element("h1");
-    			h1.textContent = "misc";
-    			add_location(h1, file, 0, 0, 0);
+    			h1.textContent = "Misc view";
+    			t1 = space();
+    			button = element("button");
+    			button.textContent = "Generate uml";
+    			t3 = space();
+    			textarea = element("textarea");
+    			t4 = space();
+    			if (if_block) if_block.c();
+    			if_block_anchor = empty();
+    			add_location(h1, file, 17, 0, 437);
+    			add_location(button, file, 19, 0, 459);
+    			attr_dev(textarea, "placeholder", "Response...");
+    			set_style(textarea, "width", "100%");
+    			set_style(textarea, "height", "200px");
+    			add_location(textarea, file, 21, 0, 537);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, h1, anchor);
+    			insert_dev(target, t1, anchor);
+    			insert_dev(target, button, anchor);
+    			insert_dev(target, t3, anchor);
+    			insert_dev(target, textarea, anchor);
+    			set_input_value(textarea, /*responseText*/ ctx[1]);
+    			insert_dev(target, t4, anchor);
+    			if (if_block) if_block.m(target, anchor);
+    			insert_dev(target, if_block_anchor, anchor);
+
+    			if (!mounted) {
+    				dispose = [
+    					listen_dev(button, "click", /*click_handler*/ ctx[4], false, false, false, false),
+    					listen_dev(textarea, "input", /*textarea_input_handler*/ ctx[5])
+    				];
+
+    				mounted = true;
+    			}
     		},
-    		p: noop,
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*responseText*/ 2) {
+    				set_input_value(textarea, /*responseText*/ ctx[1]);
+    			}
+
+    			if (/*responseImage*/ ctx[2]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+    				} else {
+    					if_block = create_if_block$1(ctx);
+    					if_block.c();
+    					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+    				}
+    			} else if (if_block) {
+    				if_block.d(1);
+    				if_block = null;
+    			}
+    		},
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(h1);
+    			if (detaching) detach_dev(t1);
+    			if (detaching) detach_dev(button);
+    			if (detaching) detach_dev(t3);
+    			if (detaching) detach_dev(textarea);
+    			if (detaching) detach_dev(t4);
+    			if (if_block) if_block.d(detaching);
+    			if (detaching) detach_dev(if_block_anchor);
+    			mounted = false;
+    			run_all(dispose);
     		}
     	};
 
@@ -3266,22 +3440,79 @@ var app = (function () {
     	return block;
     }
 
-    function instance$1($$self, $$props) {
+    function instance$1($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Misc', slots, []);
-    	const writable_props = [];
+    	let { sendText } = $$props;
+    	let copiedText = '';
+    	let responseText = '';
+    	let responseImage = '';
+
+    	window.addEventListener('message', event => {
+    		const message = event.data;
+
+    		if (message.type === 'responseText') {
+    			$$invalidate(1, responseText = message.value);
+    		} else if (message.type === 'responseImage') {
+    			$$invalidate(2, responseImage = message.value);
+    		}
+    	});
+
+    	$$self.$$.on_mount.push(function () {
+    		if (sendText === undefined && !('sendText' in $$props || $$self.$$.bound[$$self.$$.props['sendText']])) {
+    			console.warn("<Misc> was created without expected prop 'sendText'");
+    		}
+    	});
+
+    	const writable_props = ['sendText'];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Misc> was created with unknown prop '${key}'`);
     	});
 
-    	return [];
+    	const click_handler = () => sendText(copiedText, 'Uml');
+
+    	function textarea_input_handler() {
+    		responseText = this.value;
+    		$$invalidate(1, responseText);
+    	}
+
+    	$$self.$$set = $$props => {
+    		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		sendText,
+    		copiedText,
+    		responseText,
+    		responseImage
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
+    		if ('copiedText' in $$props) $$invalidate(3, copiedText = $$props.copiedText);
+    		if ('responseText' in $$props) $$invalidate(1, responseText = $$props.responseText);
+    		if ('responseImage' in $$props) $$invalidate(2, responseImage = $$props.responseImage);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [
+    		sendText,
+    		responseText,
+    		responseImage,
+    		copiedText,
+    		click_handler,
+    		textarea_input_handler
+    	];
     }
 
     class Misc extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$1, create_fragment$1, safe_not_equal, {});
+    		init(this, options, instance$1, create_fragment$1, safe_not_equal, { sendText: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
@@ -3290,22 +3521,30 @@ var app = (function () {
     			id: create_fragment$1.name
     		});
     	}
+
+    	get sendText() {
+    		throw new Error("<Misc>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set sendText(value) {
+    		throw new Error("<Misc>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
     }
 
     /* webviews\components\Sidebar.svelte generated by Svelte v3.59.2 */
 
     const { console: console_1 } = globals;
 
-    // (108:0) {#if currentView === 'Comment'}
+    // (118:0) {#if currentView === 'Comment'}
     function create_if_block_8(ctx) {
     	let comment_1;
     	let current;
 
     	comment_1 = new Comment({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[11],
-    				sendText: /*sendText*/ ctx[12],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[13]
+    				getSelectedText: /*getSelectedText*/ ctx[13],
+    				sendText: /*sendText*/ ctx[14],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
     			},
     			$$inline: true
     		});
@@ -3337,23 +3576,23 @@ var app = (function () {
     		block,
     		id: create_if_block_8.name,
     		type: "if",
-    		source: "(108:0) {#if currentView === 'Comment'}",
+    		source: "(118:0) {#if currentView === 'Comment'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (111:0) {#if currentView === 'Debug'}
+    // (121:0) {#if currentView === 'Debug'}
     function create_if_block_7(ctx) {
     	let debug_1;
     	let current;
 
     	debug_1 = new Debug({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[11],
-    				sendText: /*sendText*/ ctx[12],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[13]
+    				getSelectedText: /*getSelectedText*/ ctx[13],
+    				sendText: /*sendText*/ ctx[14],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
     			},
     			$$inline: true
     		});
@@ -3385,23 +3624,23 @@ var app = (function () {
     		block,
     		id: create_if_block_7.name,
     		type: "if",
-    		source: "(111:0) {#if currentView === 'Debug'}",
+    		source: "(121:0) {#if currentView === 'Debug'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (114:0) {#if currentView === 'Test'}
+    // (124:0) {#if currentView === 'Test'}
     function create_if_block_6(ctx) {
     	let test;
     	let current;
 
     	test = new Test({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[11],
-    				sendText: /*sendText*/ ctx[12],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[13]
+    				getSelectedText: /*getSelectedText*/ ctx[13],
+    				sendText: /*sendText*/ ctx[14],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
     			},
     			$$inline: true
     		});
@@ -3433,23 +3672,23 @@ var app = (function () {
     		block,
     		id: create_if_block_6.name,
     		type: "if",
-    		source: "(114:0) {#if currentView === 'Test'}",
+    		source: "(124:0) {#if currentView === 'Test'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (117:0) {#if currentView === 'Optimize'}
+    // (127:0) {#if currentView === 'Optimize'}
     function create_if_block_5(ctx) {
     	let optimize;
     	let current;
 
     	optimize = new Optimize({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[11],
-    				sendText: /*sendText*/ ctx[12],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[13]
+    				getSelectedText: /*getSelectedText*/ ctx[13],
+    				sendText: /*sendText*/ ctx[14],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
     			},
     			$$inline: true
     		});
@@ -3481,23 +3720,23 @@ var app = (function () {
     		block,
     		id: create_if_block_5.name,
     		type: "if",
-    		source: "(117:0) {#if currentView === 'Optimize'}",
+    		source: "(127:0) {#if currentView === 'Optimize'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (120:0) {#if currentView === 'Clean'}
+    // (130:0) {#if currentView === 'Clean'}
     function create_if_block_4(ctx) {
     	let clean;
     	let current;
 
     	clean = new Clean({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[11],
-    				sendText: /*sendText*/ ctx[12],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[13]
+    				getSelectedText: /*getSelectedText*/ ctx[13],
+    				sendText: /*sendText*/ ctx[14],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
     			},
     			$$inline: true
     		});
@@ -3529,23 +3768,23 @@ var app = (function () {
     		block,
     		id: create_if_block_4.name,
     		type: "if",
-    		source: "(120:0) {#if currentView === 'Clean'}",
+    		source: "(130:0) {#if currentView === 'Clean'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (123:0) {#if currentView === 'Document'}
+    // (133:0) {#if currentView === 'Document'}
     function create_if_block_3(ctx) {
     	let document;
     	let current;
 
     	document = new Document({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[11],
-    				sendText: /*sendText*/ ctx[12],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[13]
+    				getSelectedText: /*getSelectedText*/ ctx[13],
+    				sendText: /*sendText*/ ctx[14],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
     			},
     			$$inline: true
     		});
@@ -3577,23 +3816,23 @@ var app = (function () {
     		block,
     		id: create_if_block_3.name,
     		type: "if",
-    		source: "(123:0) {#if currentView === 'Document'}",
+    		source: "(133:0) {#if currentView === 'Document'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (126:0) {#if currentView === 'Generate'}
+    // (136:0) {#if currentView === 'Generate'}
     function create_if_block_2(ctx) {
     	let generate;
     	let current;
 
     	generate = new Generate({
     			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[11],
-    				sendText: /*sendText*/ ctx[12],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[13]
+    				getSelectedText: /*getSelectedText*/ ctx[13],
+    				sendText: /*sendText*/ ctx[14],
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
     			},
     			$$inline: true
     		});
@@ -3625,24 +3864,20 @@ var app = (function () {
     		block,
     		id: create_if_block_2.name,
     		type: "if",
-    		source: "(126:0) {#if currentView === 'Generate'}",
+    		source: "(136:0) {#if currentView === 'Generate'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (129:0) {#if currentView === 'Misc'}
+    // (139:0) {#if currentView === 'Misc'}
     function create_if_block_1(ctx) {
     	let misc;
     	let current;
 
     	misc = new Misc({
-    			props: {
-    				getSelectedText: /*getSelectedText*/ ctx[11],
-    				sendText: /*sendText*/ ctx[12],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[13]
-    			},
+    			props: { sendText: /*sendText*/ ctx[14] },
     			$$inline: true
     		});
 
@@ -3673,14 +3908,14 @@ var app = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(129:0) {#if currentView === 'Misc'}",
+    		source: "(139:0) {#if currentView === 'Misc'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (132:0) {#if currentView === 'Options'}
+    // (142:0) {#if currentView === 'Options'}
     function create_if_block(ctx) {
     	let options;
     	let current;
@@ -3691,15 +3926,17 @@ var app = (function () {
     				currentModel: /*currentModel*/ ctx[0],
     				maxTokens: /*maxTokens*/ ctx[1],
     				apiKey: /*apiKey*/ ctx[4],
-    				useChat: /*useChat*/ ctx[5]
+    				useChat: /*useChat*/ ctx[5],
+    				useLocalApi: /*useLocalApi*/ ctx[6]
     			},
     			$$inline: true
     		});
 
-    	options.$on("changeModel", /*changeModel*/ ctx[7]);
-    	options.$on("changeMaxTokens", /*changeMaxTokens*/ ctx[8]);
-    	options.$on("changeApiKey", /*changeApiKey*/ ctx[9]);
-    	options.$on("changeUseChat", /*changeUseChat*/ ctx[10]);
+    	options.$on("changeModel", /*changeModel*/ ctx[8]);
+    	options.$on("changeMaxTokens", /*changeMaxTokens*/ ctx[9]);
+    	options.$on("changeApiKey", /*changeApiKey*/ ctx[10]);
+    	options.$on("changeUseChat", /*changeUseChat*/ ctx[11]);
+    	options.$on("changeUseLocalApi", /*changeUseLocalApi*/ ctx[12]);
 
     	const block = {
     		c: function create() {
@@ -3716,6 +3953,7 @@ var app = (function () {
     			if (dirty & /*maxTokens*/ 2) options_changes.maxTokens = /*maxTokens*/ ctx[1];
     			if (dirty & /*apiKey*/ 16) options_changes.apiKey = /*apiKey*/ ctx[4];
     			if (dirty & /*useChat*/ 32) options_changes.useChat = /*useChat*/ ctx[5];
+    			if (dirty & /*useLocalApi*/ 64) options_changes.useLocalApi = /*useLocalApi*/ ctx[6];
     			options.$set(options_changes);
     		},
     		i: function intro(local) {
@@ -3736,7 +3974,7 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(132:0) {#if currentView === 'Options'}",
+    		source: "(142:0) {#if currentView === 'Options'}",
     		ctx
     	});
 
@@ -3757,7 +3995,7 @@ var app = (function () {
     	let if_block8_anchor;
     	let current;
     	nav = new Nav({ $$inline: true });
-    	nav.$on("changeView", /*changeView*/ ctx[6]);
+    	nav.$on("changeView", /*changeView*/ ctx[7]);
     	let if_block0 = /*currentView*/ ctx[3] === 'Comment' && create_if_block_8(ctx);
     	let if_block1 = /*currentView*/ ctx[3] === 'Debug' && create_if_block_7(ctx);
     	let if_block2 = /*currentView*/ ctx[3] === 'Test' && create_if_block_6(ctx);
@@ -4097,6 +4335,7 @@ var app = (function () {
     	let currentView = 'Comment';
     	let apiKey = '';
     	let useChat = false;
+    	let useLocalApi = false;
     	getApiModels();
 
     	window.addEventListener('message', event => {
@@ -4161,6 +4400,19 @@ var app = (function () {
     		getApiModels();
     	}
 
+    	async function changeUseLocalApi(event) {
+    		$$invalidate(6, useLocalApi = event.detail);
+
+    		try {
+    			await vscode.postMessage({
+    				type: 'onChangeUseLocalApi',
+    				value: useLocalApi
+    			});
+    		} catch(error) {
+    			console.log('Error executing command:', error);
+    		}
+    	}
+
     	async function getApiModels() {
     		try {
     			await vscode.postMessage({ type: 'getmodels' });
@@ -4221,11 +4473,13 @@ var app = (function () {
     		currentView,
     		apiKey,
     		useChat,
+    		useLocalApi,
     		changeView,
     		changeModel,
     		changeMaxTokens,
     		changeApiKey,
     		changeUseChat,
+    		changeUseLocalApi,
     		getApiModels,
     		getSelectedText,
     		sendText,
@@ -4239,6 +4493,7 @@ var app = (function () {
     		if ('currentView' in $$props) $$invalidate(3, currentView = $$props.currentView);
     		if ('apiKey' in $$props) $$invalidate(4, apiKey = $$props.apiKey);
     		if ('useChat' in $$props) $$invalidate(5, useChat = $$props.useChat);
+    		if ('useLocalApi' in $$props) $$invalidate(6, useLocalApi = $$props.useLocalApi);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -4252,11 +4507,13 @@ var app = (function () {
     		currentView,
     		apiKey,
     		useChat,
+    		useLocalApi,
     		changeView,
     		changeModel,
     		changeMaxTokens,
     		changeApiKey,
     		changeUseChat,
+    		changeUseLocalApi,
     		getSelectedText,
     		sendText,
     		replaceSelectedText

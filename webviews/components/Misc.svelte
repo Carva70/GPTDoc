@@ -1,1 +1,28 @@
-<h1>misc</h1>
+<script>
+    export let sendText;
+
+    let copiedText = '';
+    let responseText = '';
+    let responseImage = '';
+
+    window.addEventListener('message', (event) => {
+        const message = event.data;
+        if (message.type === 'responseText') {
+            responseText = message.value;
+        } else if (message.type === 'responseImage') {
+            responseImage = message.value;
+        }
+    });
+</script>
+
+<h1>Misc view</h1>
+
+<button on:click={() => sendText(copiedText, 'Uml')}>Generate uml</button>
+
+<textarea bind:value={responseText} placeholder="Response..." style="width: 100%; height: 200px;"
+></textarea>
+
+<!-- Add the following img element to render the image -->
+{#if responseImage}
+    <img src={responseImage} alt="" style="max-width: 100%; height: auto;" />
+{/if}
