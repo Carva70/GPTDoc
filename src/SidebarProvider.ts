@@ -117,6 +117,34 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     }
                     break;
                 }
+                case 'complexPrompt': {
+                    let responseText: string | null = '';
+                    if (data.view == 'Uml') {
+                        responseText = await this.umlComplexPrompt();
+
+                        const { geturl } = require('./plantuml.js');
+                        if (responseText !== null) {
+                            const isCodeBlock = responseText.startsWith('```');
+
+                            const noMdResponse = isCodeBlock
+                                ? responseText.split('\n').slice(1, -1).join('\n')
+                                : responseText;
+
+                            responseText = noMdResponse;
+                        }
+                        const responseImage = geturl(responseText);
+                        webviewView.webview.postMessage({
+                            type: 'responseImage',
+                            value: responseImage,
+                        });
+                    } else if (data.view == 'Document') {
+                        responseText = await this.latexComplexPrompt();
+                    }
+                    webviewView.webview.postMessage({
+                        type: 'responseText',
+                        value: responseText,
+                    });
+                }
                 case 'replacetext': {
                     try {
                         const editor = vscode.window.activeTextEditor;
@@ -142,6 +170,120 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 }
             }
         });
+    }
+
+    private async umlComplexPrompt(): Promise<string | null> {
+        const editor = vscode.window.activeTextEditor;
+        if (editor === undefined) {
+            return null;
+        }
+
+        const code = editor.document.getText();
+        const codePrompt = `Please provide a concise overview of the code:\n${code}\n`;
+
+        const systemMessageClasses = `You are an assistant. Summarize each class by listing its attributes and their types in a few words:\n`;
+
+        const systemMessageRelations = `You are an assistant. Review the code for class relations. For each class, mention any relations using 4-5 words. Classify as aggregation, composition, extension, etc. Also, specify one-to-one, one-to-many, or many-to-many relations:\n`;
+
+        const responseClassesAttributes = await this.callPrompt(codePrompt, systemMessageClasses);
+        console.log(responseClassesAttributes);
+
+        const responseRelations = await this.callPrompt(codePrompt, systemMessageRelations);
+        console.log(responseRelations);
+
+        if (responseClassesAttributes && responseRelations) {
+            const systemMessage =
+                'You are an assistant. Generate a comprehensive PlantUML diagram from the provided classes and their attributes. Respond only with the PlantUML code, using @startuml //plantuml @enduml format. Ensure correct arrow usage for each relation. Ensure all relations are represented:\n';
+
+            const generateUmlPrompt = `Classes and Attributes:\n${responseClassesAttributes}\n\nRelations:\n${responseRelations}`;
+            const response = await this.callPrompt(generateUmlPrompt, systemMessage);
+            console.log(response);
+
+            if (response) return response;
+            return null;
+        }
+
+        return null;
+    }
+
+    private async latexComplexPrompt(): Promise<string | null> {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return null;
+        }
+
+        const code = editor.document.getText();
+        const codePrompt = `Provide a concise overview of the code:\n${code}\n`;
+
+        const introFuncMsg =
+            'You are an assistant. Generate the Introduction and Functionality sections for the LaTeX documentation.\n' +
+            'Provide a brief explanation of the code and explain what it does and how it achieves its purpose.\n' +
+            'The response must be 2 sections in latex format.\n' +
+            'Response example:\n' +
+            '\\section{Introduction}\n' +
+            'This code implements a sorting algorithm using a divide and conquer approach.\n' +
+            '\\section{Functionality}\n' +
+            'It takes an unsorted array as input and returns the array sorted in ascending order.\n';
+
+        const paramsReturnValsMsg =
+            'You are an assistant. Generate the Parameters and Return Values sections for the LaTeX documentation.\n' +
+            'List and describe the parameters used in the code, and explain the values returned by the code.\n' +
+            'The response must be 1 section in latex format.\n' +
+            'Response example:\n' +
+            '\\section{Parameters and Return Values}\n' +
+            'The function takes two parameters:\n' +
+            '\\begin{itemize}\n' +
+            '    \\item \\texttt{arr}: The unsorted array to be sorted.\n' +
+            '    \\item \\texttt{len}: The length of the array.\n' +
+            '\\end{itemize}\n' +
+            'The function returns void.\n';
+
+        const usageExamplesMsg =
+            'You are an assistant. Generate the Usage and Examples sections for the LaTeX documentation.\n' +
+            'Describe how to use the code and provide examples demonstrating its usage.\n' +
+            'The response must be 1 section in latex format.\n' +
+            'Response example:\n' +
+            '\\section{Usage and Examples}\n' +
+            'To use the sorting algorithm, call the function as follows:\n' +
+            '\\begin{verbatim}\n' +
+            'sortArray(myArray, length);\n' +
+            '\\end{verbatim}\n' +
+            '\\subsection{Example 1}\n' +
+            'Sort an array of integers:\n' +
+            '\\begin{verbatim}\n' +
+            'const myArray = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5];\n' +
+            'sortArray(myArray, myArray.length);\n' +
+            '\\end{verbatim}\n' +
+            '\\subsection{Example 2}\n' +
+            'Sort an array of strings:\n' +
+            '\\begin{verbatim}\n' +
+            'const strArray = ["apple", "orange", "banana", "grape"];\n' +
+            'sortArray(strArray, strArray.length);\n' +
+            '\\end{verbatim}\n';
+
+        const respIntroFunc = await this.callPrompt(codePrompt, introFuncMsg);
+        console.log(respIntroFunc);
+
+        const respParamsReturnVals = await this.callPrompt(codePrompt, paramsReturnValsMsg);
+        console.log(respParamsReturnVals);
+
+        const respUsageExamples = await this.callPrompt(codePrompt, usageExamplesMsg);
+        console.log(respUsageExamples);
+
+        if (respIntroFunc && respParamsReturnVals && respUsageExamples) {
+            return `
+            ${respIntroFunc}
+            ${respParamsReturnVals}
+            ${respUsageExamples}
+            `;
+        }
+
+        return null;
+    }
+
+    private async callPrompt(prompt: string, systemmessage: string): Promise<string | null> {
+        if (this._useLocalApi) return this.localCall(prompt, systemmessage);
+        return this.openaiApiCall(prompt, systemmessage);
     }
 
     private async generatePrompt(selected: string, view: string): Promise<string | null> {
@@ -330,38 +472,44 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 }
             }
             case 'Document': {
-                prompt = selected;
-                systemMessage =
-                    'You are an assistant tasked with generating a detailed LaTeX documentation for the provided code. Follow these guidelines:\n' +
-                    '- Use LaTeX syntax to create a well-structured documentation.\n' +
-                    '- Include sections such as Introduction, Functionality, Parameters, Return Values, Usage, and Examples.\n' +
-                    '- Provide detailed explanations for each section, explaining the purpose and functionality of the code.\n' +
-                    '- Respond with only the LaTeX code in text format. Do not return a markdown or any other format. Type the LaTeX code directly.\n\n' +
-                    'Example:\n' +
-                    'User code:\n' +
-                    'function addNumbers(a, b) {\n' +
-                    '    // Adds two numbers\n' +
-                    '    return a + b;\n' +
-                    '}\n' +
-                    'Your Response:\n' +
-                    '\\section{Introduction}\n' +
-                    'This code defines a function to add two numbers.\n\n' +
-                    '\\section{Functionality}\n' +
-                    'The function takes two parameters and returns their sum.\n\n' +
-                    '\\section{Parameters}\n' +
-                    '\\begin{itemize}\n' +
-                    '\\item \\texttt{a} - The first number to be added.\n' +
-                    '\\item \\texttt{b} - The second number to be added.\n' +
-                    '\\end{itemize}\n\n' +
-                    '\\section{Return Values}\n' +
-                    'The function returns the sum of the input numbers.\n\n' +
-                    '\\section{Usage}\n' +
-                    'To use this function, call it with two numbers as arguments.\n\n' +
-                    '\\section{Examples}\n' +
-                    '\\begin{verbatim}\n' +
-                    'result = addNumbers(3, 5);\n' +
-                    '\\end{verbatim}\n';
-                break;
+                if (editor) {
+                    const entireDocument = editor.document.getText();
+                    prompt = `Document:\n${entireDocument}\nGenerate:\n${selected}\n`;
+
+                    systemMessage =
+                        'You are an assistant tasked with generating a detailed LaTeX documentation for the provided code. Follow these guidelines:\n' +
+                        '- Use LaTeX syntax to create a well-structured documentation.\n' +
+                        '- Include sections such as Introduction, Functionality, Parameters, Return Values, Usage, and Examples.\n' +
+                        '- Provide detailed explanations for each section, explaining the purpose and functionality of the code.\n' +
+                        '- Respond with only the LaTeX code in text format. Do not return a markdown or any other format. Type the LaTeX code directly.\n\n' +
+                        'Example:\n' +
+                        'User code:\n' +
+                        'function addNumbers(a, b) {\n' +
+                        '    // Adds two numbers\n' +
+                        '    return a + b;\n' +
+                        '}\n' +
+                        'Your Response:\n' +
+                        '\\section{Introduction}\n' +
+                        'This code defines a function to add two numbers.\n\n' +
+                        '\\section{Functionality}\n' +
+                        'The function takes two parameters and returns their sum.\n\n' +
+                        '\\section{Parameters}\n' +
+                        '\\begin{itemize}\n' +
+                        '\\item \\texttt{a} - The first number to be added.\n' +
+                        '\\item \\texttt{b} - The second number to be added.\n' +
+                        '\\end{itemize}\n\n' +
+                        '\\section{Return Values}\n' +
+                        'The function returns the sum of the input numbers.\n\n' +
+                        '\\section{Usage}\n' +
+                        'To use this function, call it with two numbers as arguments.\n\n' +
+                        '\\section{Examples}\n' +
+                        '\\begin{verbatim}\n' +
+                        'result = addNumbers(3, 5);\n' +
+                        '\\end{verbatim}\n';
+                    break;
+                } else {
+                    console.error('No active text editor found.');
+                }
             }
             case 'Uml': {
                 if (editor) {
@@ -442,14 +590,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         };
 
         try {
-            console.log('Sending...');
             const response = await axios.post(url, data);
 
             if (response.status === 200) {
                 let result = response.data.result || '';
                 result = result.split('\n').slice(4).join('\n');
-                console.log('Simulation Result:');
-                console.log(result);
                 return result;
             } else {
                 const errorMessage = response.data.error || '';

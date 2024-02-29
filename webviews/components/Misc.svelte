@@ -1,5 +1,6 @@
 <script>
     export let sendText;
+    export let complexPrompt;
 
     let copiedText = '';
     let responseText = '';
@@ -17,12 +18,13 @@
 
 <h1>Misc view</h1>
 
-<button on:click={() => sendText(copiedText, 'Uml')}>Generate uml</button>
+<button on:click={() => sendText(copiedText, 'Uml')}>Generate uml (single prompt)</button>
+
+<button on:click={() => complexPrompt(copiedText, 'Uml')}>Generate uml</button>
 
 <textarea bind:value={responseText} placeholder="Response..." style="width: 100%; height: 200px;"
 ></textarea>
 
-<!-- Add the following img element to render the image -->
 {#if responseImage}
     <img src={responseImage} alt="" style="max-width: 100%; height: auto;" />
 {/if}

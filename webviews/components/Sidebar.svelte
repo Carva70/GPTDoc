@@ -104,6 +104,14 @@
         }
     }
 
+    async function complexPrompt(copiedText, view) {
+        try {
+            await vscode.postMessage({ type: 'complexPrompt', value: copiedText, view: view });
+        } catch (error) {
+            console.log('Error executing command:', error);
+        }
+    }
+
     async function replaceSelectedText(responseText) {
         try {
             await vscode.postMessage({ type: 'replacetext', value: responseText });
@@ -131,13 +139,13 @@
     <Clean {getSelectedText} {sendText} {replaceSelectedText} />
 {/if}
 {#if currentView === 'Document'}
-    <Document {getSelectedText} {sendText} {replaceSelectedText} />
+    <Document {getSelectedText} {sendText} {complexPrompt} />
 {/if}
 {#if currentView === 'Generate'}
     <Generate {getSelectedText} {sendText} {replaceSelectedText} />
 {/if}
 {#if currentView === 'Misc'}
-    <Misc {sendText} />
+    <Misc {sendText} {complexPrompt} />
 {/if}
 {#if currentView === 'Options'}
     <Options

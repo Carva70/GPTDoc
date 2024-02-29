@@ -1,7 +1,28 @@
 <script>
+    import { blank_object } from 'svelte/internal';
+
     export let getSelectedText;
     export let sendText;
-    export let replaceSelectedText;
+    export let complexPrompt;
+
+    let asdf = `
+\\usepackage[T1]\{fontenc\}
+\\usepackage\{amsmath\}
+
+\\begin\{document\}
+\\noindent
+Bla bla bla bla :
+\\begin\{align*\}
+A &amp;= B + C - D \\\\ \\\\
+%phantom
+&amp;\\phantom\{= B + C \\;\}
+%phantom
++ D - E \\ \\
+&amp;= F + G - H.
+\\end\{align*\}
+\\end\{document\}
+    
+    `;
 
     console.log(getSelectedText);
     let copiedText = '';
@@ -17,15 +38,8 @@
     });
 </script>
 
-<h1>Document view</h1>
-<button on:click={() => getSelectedText()}>Selection to prompt</button>
-
-<textarea bind:value={copiedText} placeholder="Prompt code" style="width: 100%; height: 200px;"
-></textarea>
-
-<button on:click={() => sendText(copiedText, 'Document')}>Generate latex from selected</button>
+<button on:click={() => sendText(copiedText, 'Document')}>Generate latex (single prompt)</button>
+<button on:click={() => complexPrompt(copiedText, 'Document')}>Generate latex</button>
 
 <textarea bind:value={responseText} placeholder="Response..." style="width: 100%; height: 200px;"
 ></textarea>
-
-<button on:click={() => replaceSelectedText(responseText)}>Replace selected text</button>

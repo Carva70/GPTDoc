@@ -2789,103 +2789,64 @@ var app = (function () {
     const file$2 = "webviews\\components\\Document.svelte";
 
     function create_fragment$3(ctx) {
-    	let h1;
-    	let t1;
     	let button0;
-    	let t3;
-    	let textarea0;
-    	let t4;
+    	let t1;
     	let button1;
-    	let t6;
-    	let textarea1;
-    	let t7;
-    	let button2;
+    	let t3;
+    	let textarea;
     	let mounted;
     	let dispose;
 
     	const block = {
     		c: function create() {
-    			h1 = element("h1");
-    			h1.textContent = "Document view";
-    			t1 = space();
     			button0 = element("button");
-    			button0.textContent = "Selection to prompt";
-    			t3 = space();
-    			textarea0 = element("textarea");
-    			t4 = space();
+    			button0.textContent = "Generate latex (single prompt)";
+    			t1 = space();
     			button1 = element("button");
-    			button1.textContent = "Generate latex from selected";
-    			t6 = space();
-    			textarea1 = element("textarea");
-    			t7 = space();
-    			button2 = element("button");
-    			button2.textContent = "Replace selected text";
-    			add_location(h1, file$2, 19, 0, 510);
-    			add_location(button0, file$2, 20, 0, 534);
-    			attr_dev(textarea0, "placeholder", "Prompt code");
-    			set_style(textarea0, "width", "100%");
-    			set_style(textarea0, "height", "200px");
-    			add_location(textarea0, file$2, 22, 0, 609);
-    			add_location(button1, file$2, 25, 0, 722);
-    			attr_dev(textarea1, "placeholder", "Response...");
-    			set_style(textarea1, "width", "100%");
-    			set_style(textarea1, "height", "200px");
-    			add_location(textarea1, file$2, 27, 0, 821);
-    			add_location(button2, file$2, 30, 0, 936);
+    			button1.textContent = "Generate latex";
+    			t3 = space();
+    			textarea = element("textarea");
+    			add_location(button0, file$2, 40, 0, 871);
+    			add_location(button1, file$2, 41, 0, 970);
+    			attr_dev(textarea, "placeholder", "Response...");
+    			set_style(textarea, "width", "100%");
+    			set_style(textarea, "height", "200px");
+    			add_location(textarea, file$2, 43, 0, 1060);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, h1, anchor);
-    			insert_dev(target, t1, anchor);
     			insert_dev(target, button0, anchor);
-    			insert_dev(target, t3, anchor);
-    			insert_dev(target, textarea0, anchor);
-    			set_input_value(textarea0, /*copiedText*/ ctx[3]);
-    			insert_dev(target, t4, anchor);
+    			insert_dev(target, t1, anchor);
     			insert_dev(target, button1, anchor);
-    			insert_dev(target, t6, anchor);
-    			insert_dev(target, textarea1, anchor);
-    			set_input_value(textarea1, /*responseText*/ ctx[4]);
-    			insert_dev(target, t7, anchor);
-    			insert_dev(target, button2, anchor);
+    			insert_dev(target, t3, anchor);
+    			insert_dev(target, textarea, anchor);
+    			set_input_value(textarea, /*responseText*/ ctx[3]);
 
     			if (!mounted) {
     				dispose = [
     					listen_dev(button0, "click", /*click_handler*/ ctx[5], false, false, false, false),
-    					listen_dev(textarea0, "input", /*textarea0_input_handler*/ ctx[6]),
-    					listen_dev(button1, "click", /*click_handler_1*/ ctx[7], false, false, false, false),
-    					listen_dev(textarea1, "input", /*textarea1_input_handler*/ ctx[8]),
-    					listen_dev(button2, "click", /*click_handler_2*/ ctx[9], false, false, false, false)
+    					listen_dev(button1, "click", /*click_handler_1*/ ctx[6], false, false, false, false),
+    					listen_dev(textarea, "input", /*textarea_input_handler*/ ctx[7])
     				];
 
     				mounted = true;
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*copiedText*/ 8) {
-    				set_input_value(textarea0, /*copiedText*/ ctx[3]);
-    			}
-
-    			if (dirty & /*responseText*/ 16) {
-    				set_input_value(textarea1, /*responseText*/ ctx[4]);
+    			if (dirty & /*responseText*/ 8) {
+    				set_input_value(textarea, /*responseText*/ ctx[3]);
     			}
     		},
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(h1);
-    			if (detaching) detach_dev(t1);
     			if (detaching) detach_dev(button0);
-    			if (detaching) detach_dev(t3);
-    			if (detaching) detach_dev(textarea0);
-    			if (detaching) detach_dev(t4);
+    			if (detaching) detach_dev(t1);
     			if (detaching) detach_dev(button1);
-    			if (detaching) detach_dev(t6);
-    			if (detaching) detach_dev(textarea1);
-    			if (detaching) detach_dev(t7);
-    			if (detaching) detach_dev(button2);
+    			if (detaching) detach_dev(t3);
+    			if (detaching) detach_dev(textarea);
     			mounted = false;
     			run_all(dispose);
     		}
@@ -2907,7 +2868,27 @@ var app = (function () {
     	validate_slots('Document', slots, []);
     	let { getSelectedText } = $$props;
     	let { sendText } = $$props;
-    	let { replaceSelectedText } = $$props;
+    	let { complexPrompt } = $$props;
+
+    	let asdf = `
+\\usepackage[T1]\{fontenc\}
+\\usepackage\{amsmath\}
+
+\\begin\{document\}
+\\noindent
+Bla bla bla bla :
+\\begin\{align*\}
+A &amp;= B + C - D \\\\ \\\\
+%phantom
+&amp;\\phantom\{= B + C \\;\}
+%phantom
++ D - E \\ \\
+&amp;= F + G - H.
+\\end\{align*\}
+\\end\{document\}
+    
+    `;
+
     	console.log(getSelectedText);
     	let copiedText = '';
     	let responseText = '';
@@ -2916,9 +2897,9 @@ var app = (function () {
     		const message = event.data;
 
     		if (message.type === 'setCopiedText') {
-    			$$invalidate(3, copiedText = message.value);
+    			$$invalidate(2, copiedText = message.value);
     		} else if (message.type === 'responseText') {
-    			$$invalidate(4, responseText = message.value);
+    			$$invalidate(3, responseText = message.value);
     		}
     	});
 
@@ -2931,53 +2912,48 @@ var app = (function () {
     			console_1$2.warn("<Document> was created without expected prop 'sendText'");
     		}
 
-    		if (replaceSelectedText === undefined && !('replaceSelectedText' in $$props || $$self.$$.bound[$$self.$$.props['replaceSelectedText']])) {
-    			console_1$2.warn("<Document> was created without expected prop 'replaceSelectedText'");
+    		if (complexPrompt === undefined && !('complexPrompt' in $$props || $$self.$$.bound[$$self.$$.props['complexPrompt']])) {
+    			console_1$2.warn("<Document> was created without expected prop 'complexPrompt'");
     		}
     	});
 
-    	const writable_props = ['getSelectedText', 'sendText', 'replaceSelectedText'];
+    	const writable_props = ['getSelectedText', 'sendText', 'complexPrompt'];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$2.warn(`<Document> was created with unknown prop '${key}'`);
     	});
 
-    	const click_handler = () => getSelectedText();
+    	const click_handler = () => sendText(copiedText, 'Document');
+    	const click_handler_1 = () => complexPrompt(copiedText, 'Document');
 
-    	function textarea0_input_handler() {
-    		copiedText = this.value;
-    		$$invalidate(3, copiedText);
-    	}
-
-    	const click_handler_1 = () => sendText(copiedText, 'Document');
-
-    	function textarea1_input_handler() {
+    	function textarea_input_handler() {
     		responseText = this.value;
-    		$$invalidate(4, responseText);
+    		$$invalidate(3, responseText);
     	}
-
-    	const click_handler_2 = () => replaceSelectedText(responseText);
 
     	$$self.$$set = $$props => {
-    		if ('getSelectedText' in $$props) $$invalidate(0, getSelectedText = $$props.getSelectedText);
-    		if ('sendText' in $$props) $$invalidate(1, sendText = $$props.sendText);
-    		if ('replaceSelectedText' in $$props) $$invalidate(2, replaceSelectedText = $$props.replaceSelectedText);
+    		if ('getSelectedText' in $$props) $$invalidate(4, getSelectedText = $$props.getSelectedText);
+    		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
+    		if ('complexPrompt' in $$props) $$invalidate(1, complexPrompt = $$props.complexPrompt);
     	};
 
     	$$self.$capture_state = () => ({
+    		blank_object,
     		getSelectedText,
     		sendText,
-    		replaceSelectedText,
+    		complexPrompt,
+    		asdf,
     		copiedText,
     		responseText
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('getSelectedText' in $$props) $$invalidate(0, getSelectedText = $$props.getSelectedText);
-    		if ('sendText' in $$props) $$invalidate(1, sendText = $$props.sendText);
-    		if ('replaceSelectedText' in $$props) $$invalidate(2, replaceSelectedText = $$props.replaceSelectedText);
-    		if ('copiedText' in $$props) $$invalidate(3, copiedText = $$props.copiedText);
-    		if ('responseText' in $$props) $$invalidate(4, responseText = $$props.responseText);
+    		if ('getSelectedText' in $$props) $$invalidate(4, getSelectedText = $$props.getSelectedText);
+    		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
+    		if ('complexPrompt' in $$props) $$invalidate(1, complexPrompt = $$props.complexPrompt);
+    		if ('asdf' in $$props) asdf = $$props.asdf;
+    		if ('copiedText' in $$props) $$invalidate(2, copiedText = $$props.copiedText);
+    		if ('responseText' in $$props) $$invalidate(3, responseText = $$props.responseText);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -2985,16 +2961,14 @@ var app = (function () {
     	}
 
     	return [
-    		getSelectedText,
     		sendText,
-    		replaceSelectedText,
+    		complexPrompt,
     		copiedText,
     		responseText,
+    		getSelectedText,
     		click_handler,
-    		textarea0_input_handler,
     		click_handler_1,
-    		textarea1_input_handler,
-    		click_handler_2
+    		textarea_input_handler
     	];
     }
 
@@ -3003,9 +2977,9 @@ var app = (function () {
     		super(options);
 
     		init(this, options, instance$3, create_fragment$3, safe_not_equal, {
-    			getSelectedText: 0,
-    			sendText: 1,
-    			replaceSelectedText: 2
+    			getSelectedText: 4,
+    			sendText: 0,
+    			complexPrompt: 1
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -3032,11 +3006,11 @@ var app = (function () {
     		throw new Error("<Document>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get replaceSelectedText() {
+    	get complexPrompt() {
     		throw new Error("<Document>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set replaceSelectedText(value) {
+    	set complexPrompt(value) {
     		throw new Error("<Document>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
@@ -3303,7 +3277,7 @@ var app = (function () {
 
     const file = "webviews\\components\\Misc.svelte";
 
-    // (26:0) {#if responseImage}
+    // (28:0) {#if responseImage}
     function create_if_block$1(ctx) {
     	let img;
     	let img_src_value;
@@ -3311,17 +3285,17 @@ var app = (function () {
     	const block = {
     		c: function create() {
     			img = element("img");
-    			if (!src_url_equal(img.src, img_src_value = /*responseImage*/ ctx[2])) attr_dev(img, "src", img_src_value);
+    			if (!src_url_equal(img.src, img_src_value = /*responseImage*/ ctx[3])) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "");
     			set_style(img, "max-width", "100%");
     			set_style(img, "height", "auto");
-    			add_location(img, file, 26, 4, 737);
+    			add_location(img, file, 28, 4, 807);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*responseImage*/ 4 && !src_url_equal(img.src, img_src_value = /*responseImage*/ ctx[2])) {
+    			if (dirty & /*responseImage*/ 8 && !src_url_equal(img.src, img_src_value = /*responseImage*/ ctx[3])) {
     				attr_dev(img, "src", img_src_value);
     			}
     		},
@@ -3334,7 +3308,7 @@ var app = (function () {
     		block,
     		id: create_if_block$1.name,
     		type: "if",
-    		source: "(26:0) {#if responseImage}",
+    		source: "(28:0) {#if responseImage}",
     		ctx
     	});
 
@@ -3344,33 +3318,39 @@ var app = (function () {
     function create_fragment$1(ctx) {
     	let h1;
     	let t1;
-    	let button;
+    	let button0;
     	let t3;
+    	let button1;
+    	let t5;
     	let textarea;
-    	let t4;
+    	let t6;
     	let if_block_anchor;
     	let mounted;
     	let dispose;
-    	let if_block = /*responseImage*/ ctx[2] && create_if_block$1(ctx);
+    	let if_block = /*responseImage*/ ctx[3] && create_if_block$1(ctx);
 
     	const block = {
     		c: function create() {
     			h1 = element("h1");
     			h1.textContent = "Misc view";
     			t1 = space();
-    			button = element("button");
-    			button.textContent = "Generate uml";
+    			button0 = element("button");
+    			button0.textContent = "Generate uml (single prompt)";
     			t3 = space();
+    			button1 = element("button");
+    			button1.textContent = "Generate uml";
+    			t5 = space();
     			textarea = element("textarea");
-    			t4 = space();
+    			t6 = space();
     			if (if_block) if_block.c();
     			if_block_anchor = empty();
-    			add_location(h1, file, 17, 0, 437);
-    			add_location(button, file, 19, 0, 459);
+    			add_location(h1, file, 18, 0, 468);
+    			add_location(button0, file, 20, 0, 490);
+    			add_location(button1, file, 22, 0, 584);
     			attr_dev(textarea, "placeholder", "Response...");
     			set_style(textarea, "width", "100%");
     			set_style(textarea, "height", "200px");
-    			add_location(textarea, file, 21, 0, 537);
+    			add_location(textarea, file, 24, 0, 667);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3378,29 +3358,32 @@ var app = (function () {
     		m: function mount(target, anchor) {
     			insert_dev(target, h1, anchor);
     			insert_dev(target, t1, anchor);
-    			insert_dev(target, button, anchor);
+    			insert_dev(target, button0, anchor);
     			insert_dev(target, t3, anchor);
+    			insert_dev(target, button1, anchor);
+    			insert_dev(target, t5, anchor);
     			insert_dev(target, textarea, anchor);
-    			set_input_value(textarea, /*responseText*/ ctx[1]);
-    			insert_dev(target, t4, anchor);
+    			set_input_value(textarea, /*responseText*/ ctx[2]);
+    			insert_dev(target, t6, anchor);
     			if (if_block) if_block.m(target, anchor);
     			insert_dev(target, if_block_anchor, anchor);
 
     			if (!mounted) {
     				dispose = [
-    					listen_dev(button, "click", /*click_handler*/ ctx[4], false, false, false, false),
-    					listen_dev(textarea, "input", /*textarea_input_handler*/ ctx[5])
+    					listen_dev(button0, "click", /*click_handler*/ ctx[5], false, false, false, false),
+    					listen_dev(button1, "click", /*click_handler_1*/ ctx[6], false, false, false, false),
+    					listen_dev(textarea, "input", /*textarea_input_handler*/ ctx[7])
     				];
 
     				mounted = true;
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*responseText*/ 2) {
-    				set_input_value(textarea, /*responseText*/ ctx[1]);
+    			if (dirty & /*responseText*/ 4) {
+    				set_input_value(textarea, /*responseText*/ ctx[2]);
     			}
 
-    			if (/*responseImage*/ ctx[2]) {
+    			if (/*responseImage*/ ctx[3]) {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
@@ -3418,10 +3401,12 @@ var app = (function () {
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(h1);
     			if (detaching) detach_dev(t1);
-    			if (detaching) detach_dev(button);
+    			if (detaching) detach_dev(button0);
     			if (detaching) detach_dev(t3);
+    			if (detaching) detach_dev(button1);
+    			if (detaching) detach_dev(t5);
     			if (detaching) detach_dev(textarea);
-    			if (detaching) detach_dev(t4);
+    			if (detaching) detach_dev(t6);
     			if (if_block) if_block.d(detaching);
     			if (detaching) detach_dev(if_block_anchor);
     			mounted = false;
@@ -3444,6 +3429,7 @@ var app = (function () {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Misc', slots, []);
     	let { sendText } = $$props;
+    	let { complexPrompt } = $$props;
     	let copiedText = '';
     	let responseText = '';
     	let responseImage = '';
@@ -3452,9 +3438,9 @@ var app = (function () {
     		const message = event.data;
 
     		if (message.type === 'responseText') {
-    			$$invalidate(1, responseText = message.value);
+    			$$invalidate(2, responseText = message.value);
     		} else if (message.type === 'responseImage') {
-    			$$invalidate(2, responseImage = message.value);
+    			$$invalidate(3, responseImage = message.value);
     		}
     	});
 
@@ -3462,27 +3448,34 @@ var app = (function () {
     		if (sendText === undefined && !('sendText' in $$props || $$self.$$.bound[$$self.$$.props['sendText']])) {
     			console.warn("<Misc> was created without expected prop 'sendText'");
     		}
+
+    		if (complexPrompt === undefined && !('complexPrompt' in $$props || $$self.$$.bound[$$self.$$.props['complexPrompt']])) {
+    			console.warn("<Misc> was created without expected prop 'complexPrompt'");
+    		}
     	});
 
-    	const writable_props = ['sendText'];
+    	const writable_props = ['sendText', 'complexPrompt'];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Misc> was created with unknown prop '${key}'`);
     	});
 
     	const click_handler = () => sendText(copiedText, 'Uml');
+    	const click_handler_1 = () => complexPrompt(copiedText, 'Uml');
 
     	function textarea_input_handler() {
     		responseText = this.value;
-    		$$invalidate(1, responseText);
+    		$$invalidate(2, responseText);
     	}
 
     	$$self.$$set = $$props => {
     		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
+    		if ('complexPrompt' in $$props) $$invalidate(1, complexPrompt = $$props.complexPrompt);
     	};
 
     	$$self.$capture_state = () => ({
     		sendText,
+    		complexPrompt,
     		copiedText,
     		responseText,
     		responseImage
@@ -3490,9 +3483,10 @@ var app = (function () {
 
     	$$self.$inject_state = $$props => {
     		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
-    		if ('copiedText' in $$props) $$invalidate(3, copiedText = $$props.copiedText);
-    		if ('responseText' in $$props) $$invalidate(1, responseText = $$props.responseText);
-    		if ('responseImage' in $$props) $$invalidate(2, responseImage = $$props.responseImage);
+    		if ('complexPrompt' in $$props) $$invalidate(1, complexPrompt = $$props.complexPrompt);
+    		if ('copiedText' in $$props) $$invalidate(4, copiedText = $$props.copiedText);
+    		if ('responseText' in $$props) $$invalidate(2, responseText = $$props.responseText);
+    		if ('responseImage' in $$props) $$invalidate(3, responseImage = $$props.responseImage);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -3501,10 +3495,12 @@ var app = (function () {
 
     	return [
     		sendText,
+    		complexPrompt,
     		responseText,
     		responseImage,
     		copiedText,
     		click_handler,
+    		click_handler_1,
     		textarea_input_handler
     	];
     }
@@ -3512,7 +3508,7 @@ var app = (function () {
     class Misc extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$1, create_fragment$1, safe_not_equal, { sendText: 0 });
+    		init(this, options, instance$1, create_fragment$1, safe_not_equal, { sendText: 0, complexPrompt: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
@@ -3529,13 +3525,21 @@ var app = (function () {
     	set sendText(value) {
     		throw new Error("<Misc>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
+
+    	get complexPrompt() {
+    		throw new Error("<Misc>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set complexPrompt(value) {
+    		throw new Error("<Misc>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
     }
 
     /* webviews\components\Sidebar.svelte generated by Svelte v3.59.2 */
 
     const { console: console_1 } = globals;
 
-    // (118:0) {#if currentView === 'Comment'}
+    // (126:0) {#if currentView === 'Comment'}
     function create_if_block_8(ctx) {
     	let comment_1;
     	let current;
@@ -3544,7 +3548,7 @@ var app = (function () {
     			props: {
     				getSelectedText: /*getSelectedText*/ ctx[13],
     				sendText: /*sendText*/ ctx[14],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[16]
     			},
     			$$inline: true
     		});
@@ -3576,14 +3580,14 @@ var app = (function () {
     		block,
     		id: create_if_block_8.name,
     		type: "if",
-    		source: "(118:0) {#if currentView === 'Comment'}",
+    		source: "(126:0) {#if currentView === 'Comment'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (121:0) {#if currentView === 'Debug'}
+    // (129:0) {#if currentView === 'Debug'}
     function create_if_block_7(ctx) {
     	let debug_1;
     	let current;
@@ -3592,7 +3596,7 @@ var app = (function () {
     			props: {
     				getSelectedText: /*getSelectedText*/ ctx[13],
     				sendText: /*sendText*/ ctx[14],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[16]
     			},
     			$$inline: true
     		});
@@ -3624,14 +3628,14 @@ var app = (function () {
     		block,
     		id: create_if_block_7.name,
     		type: "if",
-    		source: "(121:0) {#if currentView === 'Debug'}",
+    		source: "(129:0) {#if currentView === 'Debug'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (124:0) {#if currentView === 'Test'}
+    // (132:0) {#if currentView === 'Test'}
     function create_if_block_6(ctx) {
     	let test;
     	let current;
@@ -3640,7 +3644,7 @@ var app = (function () {
     			props: {
     				getSelectedText: /*getSelectedText*/ ctx[13],
     				sendText: /*sendText*/ ctx[14],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[16]
     			},
     			$$inline: true
     		});
@@ -3672,14 +3676,14 @@ var app = (function () {
     		block,
     		id: create_if_block_6.name,
     		type: "if",
-    		source: "(124:0) {#if currentView === 'Test'}",
+    		source: "(132:0) {#if currentView === 'Test'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (127:0) {#if currentView === 'Optimize'}
+    // (135:0) {#if currentView === 'Optimize'}
     function create_if_block_5(ctx) {
     	let optimize;
     	let current;
@@ -3688,7 +3692,7 @@ var app = (function () {
     			props: {
     				getSelectedText: /*getSelectedText*/ ctx[13],
     				sendText: /*sendText*/ ctx[14],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[16]
     			},
     			$$inline: true
     		});
@@ -3720,14 +3724,14 @@ var app = (function () {
     		block,
     		id: create_if_block_5.name,
     		type: "if",
-    		source: "(127:0) {#if currentView === 'Optimize'}",
+    		source: "(135:0) {#if currentView === 'Optimize'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (130:0) {#if currentView === 'Clean'}
+    // (138:0) {#if currentView === 'Clean'}
     function create_if_block_4(ctx) {
     	let clean;
     	let current;
@@ -3736,7 +3740,7 @@ var app = (function () {
     			props: {
     				getSelectedText: /*getSelectedText*/ ctx[13],
     				sendText: /*sendText*/ ctx[14],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[16]
     			},
     			$$inline: true
     		});
@@ -3768,14 +3772,14 @@ var app = (function () {
     		block,
     		id: create_if_block_4.name,
     		type: "if",
-    		source: "(130:0) {#if currentView === 'Clean'}",
+    		source: "(138:0) {#if currentView === 'Clean'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (133:0) {#if currentView === 'Document'}
+    // (141:0) {#if currentView === 'Document'}
     function create_if_block_3(ctx) {
     	let document;
     	let current;
@@ -3784,7 +3788,7 @@ var app = (function () {
     			props: {
     				getSelectedText: /*getSelectedText*/ ctx[13],
     				sendText: /*sendText*/ ctx[14],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
+    				complexPrompt: /*complexPrompt*/ ctx[15]
     			},
     			$$inline: true
     		});
@@ -3816,14 +3820,14 @@ var app = (function () {
     		block,
     		id: create_if_block_3.name,
     		type: "if",
-    		source: "(133:0) {#if currentView === 'Document'}",
+    		source: "(141:0) {#if currentView === 'Document'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (136:0) {#if currentView === 'Generate'}
+    // (144:0) {#if currentView === 'Generate'}
     function create_if_block_2(ctx) {
     	let generate;
     	let current;
@@ -3832,7 +3836,7 @@ var app = (function () {
     			props: {
     				getSelectedText: /*getSelectedText*/ ctx[13],
     				sendText: /*sendText*/ ctx[14],
-    				replaceSelectedText: /*replaceSelectedText*/ ctx[15]
+    				replaceSelectedText: /*replaceSelectedText*/ ctx[16]
     			},
     			$$inline: true
     		});
@@ -3864,20 +3868,23 @@ var app = (function () {
     		block,
     		id: create_if_block_2.name,
     		type: "if",
-    		source: "(136:0) {#if currentView === 'Generate'}",
+    		source: "(144:0) {#if currentView === 'Generate'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (139:0) {#if currentView === 'Misc'}
+    // (147:0) {#if currentView === 'Misc'}
     function create_if_block_1(ctx) {
     	let misc;
     	let current;
 
     	misc = new Misc({
-    			props: { sendText: /*sendText*/ ctx[14] },
+    			props: {
+    				sendText: /*sendText*/ ctx[14],
+    				complexPrompt: /*complexPrompt*/ ctx[15]
+    			},
     			$$inline: true
     		});
 
@@ -3908,14 +3915,14 @@ var app = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(139:0) {#if currentView === 'Misc'}",
+    		source: "(147:0) {#if currentView === 'Misc'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (142:0) {#if currentView === 'Options'}
+    // (150:0) {#if currentView === 'Options'}
     function create_if_block(ctx) {
     	let options;
     	let current;
@@ -3974,7 +3981,7 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(142:0) {#if currentView === 'Options'}",
+    		source: "(150:0) {#if currentView === 'Options'}",
     		ctx
     	});
 
@@ -4441,6 +4448,18 @@ var app = (function () {
     		}
     	}
 
+    	async function complexPrompt(copiedText, view) {
+    		try {
+    			await vscode.postMessage({
+    				type: 'complexPrompt',
+    				value: copiedText,
+    				view
+    			});
+    		} catch(error) {
+    			console.log('Error executing command:', error);
+    		}
+    	}
+
     	async function replaceSelectedText(responseText) {
     		try {
     			await vscode.postMessage({ type: 'replacetext', value: responseText });
@@ -4483,6 +4502,7 @@ var app = (function () {
     		getApiModels,
     		getSelectedText,
     		sendText,
+    		complexPrompt,
     		replaceSelectedText
     	});
 
@@ -4516,6 +4536,7 @@ var app = (function () {
     		changeUseLocalApi,
     		getSelectedText,
     		sendText,
+    		complexPrompt,
     		replaceSelectedText
     	];
     }
