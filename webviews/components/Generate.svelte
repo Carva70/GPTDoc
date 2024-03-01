@@ -17,12 +17,6 @@
     });
 </script>
 
-<h1>Generate view</h1>
-<button on:click={() => getSelectedText()}>Selection to prompt</button>
-
-<textarea bind:value={copiedText} placeholder="Prompt code" style="width: 100%; height: 200px;"
-></textarea>
-
 <button on:click={() => sendText(copiedText, 'Generate')}>Generate code</button>
 
 <textarea bind:value={responseText} placeholder="Response..." style="width: 100%; height: 200px;"

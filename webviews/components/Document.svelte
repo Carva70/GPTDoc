@@ -5,25 +5,6 @@
     export let sendText;
     export let complexPrompt;
 
-    let asdf = `
-\\usepackage[T1]\{fontenc\}
-\\usepackage\{amsmath\}
-
-\\begin\{document\}
-\\noindent
-Bla bla bla bla :
-\\begin\{align*\}
-A &amp;= B + C - D \\\\ \\\\
-%phantom
-&amp;\\phantom\{= B + C \\;\}
-%phantom
-+ D - E \\ \\
-&amp;= F + G - H.
-\\end\{align*\}
-\\end\{document\}
-    
-    `;
-
     console.log(getSelectedText);
     let copiedText = '';
     let responseText = '';

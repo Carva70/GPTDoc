@@ -2806,12 +2806,12 @@ var app = (function () {
     			button1.textContent = "Generate latex";
     			t3 = space();
     			textarea = element("textarea");
-    			add_location(button0, file$2, 40, 0, 871);
-    			add_location(button1, file$2, 41, 0, 970);
+    			add_location(button0, file$2, 21, 0, 559);
+    			add_location(button1, file$2, 22, 0, 658);
     			attr_dev(textarea, "placeholder", "Response...");
     			set_style(textarea, "width", "100%");
     			set_style(textarea, "height", "200px");
-    			add_location(textarea, file$2, 43, 0, 1060);
+    			add_location(textarea, file$2, 24, 0, 748);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2869,26 +2869,6 @@ var app = (function () {
     	let { getSelectedText } = $$props;
     	let { sendText } = $$props;
     	let { complexPrompt } = $$props;
-
-    	let asdf = `
-\\usepackage[T1]\{fontenc\}
-\\usepackage\{amsmath\}
-
-\\begin\{document\}
-\\noindent
-Bla bla bla bla :
-\\begin\{align*\}
-A &amp;= B + C - D \\\\ \\\\
-%phantom
-&amp;\\phantom\{= B + C \\;\}
-%phantom
-+ D - E \\ \\
-&amp;= F + G - H.
-\\end\{align*\}
-\\end\{document\}
-    
-    `;
-
     	console.log(getSelectedText);
     	let copiedText = '';
     	let responseText = '';
@@ -2942,7 +2922,6 @@ A &amp;= B + C - D \\\\ \\\\
     		getSelectedText,
     		sendText,
     		complexPrompt,
-    		asdf,
     		copiedText,
     		responseText
     	});
@@ -2951,7 +2930,6 @@ A &amp;= B + C - D \\\\ \\\\
     		if ('getSelectedText' in $$props) $$invalidate(4, getSelectedText = $$props.getSelectedText);
     		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
     		if ('complexPrompt' in $$props) $$invalidate(1, complexPrompt = $$props.complexPrompt);
-    		if ('asdf' in $$props) asdf = $$props.asdf;
     		if ('copiedText' in $$props) $$invalidate(2, copiedText = $$props.copiedText);
     		if ('responseText' in $$props) $$invalidate(3, responseText = $$props.responseText);
     	};
@@ -3021,103 +2999,64 @@ A &amp;= B + C - D \\\\ \\\\
     const file$1 = "webviews\\components\\Generate.svelte";
 
     function create_fragment$2(ctx) {
-    	let h1;
-    	let t1;
     	let button0;
-    	let t3;
-    	let textarea0;
-    	let t4;
+    	let t1;
+    	let textarea;
+    	let t2;
     	let button1;
-    	let t6;
-    	let textarea1;
-    	let t7;
-    	let button2;
     	let mounted;
     	let dispose;
 
     	const block = {
     		c: function create() {
-    			h1 = element("h1");
-    			h1.textContent = "Generate view";
-    			t1 = space();
     			button0 = element("button");
-    			button0.textContent = "Selection to prompt";
-    			t3 = space();
-    			textarea0 = element("textarea");
-    			t4 = space();
+    			button0.textContent = "Generate code";
+    			t1 = space();
+    			textarea = element("textarea");
+    			t2 = space();
     			button1 = element("button");
-    			button1.textContent = "Generate code";
-    			t6 = space();
-    			textarea1 = element("textarea");
-    			t7 = space();
-    			button2 = element("button");
-    			button2.textContent = "Replace selected text";
-    			add_location(h1, file$1, 19, 0, 510);
-    			add_location(button0, file$1, 20, 0, 534);
-    			attr_dev(textarea0, "placeholder", "Prompt code");
-    			set_style(textarea0, "width", "100%");
-    			set_style(textarea0, "height", "200px");
-    			add_location(textarea0, file$1, 22, 0, 609);
-    			add_location(button1, file$1, 25, 0, 722);
-    			attr_dev(textarea1, "placeholder", "Response...");
-    			set_style(textarea1, "width", "100%");
-    			set_style(textarea1, "height", "200px");
-    			add_location(textarea1, file$1, 27, 0, 806);
-    			add_location(button2, file$1, 30, 0, 921);
+    			button1.textContent = "Replace selected text";
+    			add_location(button0, file$1, 19, 0, 510);
+    			attr_dev(textarea, "placeholder", "Response...");
+    			set_style(textarea, "width", "100%");
+    			set_style(textarea, "height", "200px");
+    			add_location(textarea, file$1, 21, 0, 594);
+    			add_location(button1, file$1, 24, 0, 709);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, h1, anchor);
-    			insert_dev(target, t1, anchor);
     			insert_dev(target, button0, anchor);
-    			insert_dev(target, t3, anchor);
-    			insert_dev(target, textarea0, anchor);
-    			set_input_value(textarea0, /*copiedText*/ ctx[3]);
-    			insert_dev(target, t4, anchor);
+    			insert_dev(target, t1, anchor);
+    			insert_dev(target, textarea, anchor);
+    			set_input_value(textarea, /*responseText*/ ctx[3]);
+    			insert_dev(target, t2, anchor);
     			insert_dev(target, button1, anchor);
-    			insert_dev(target, t6, anchor);
-    			insert_dev(target, textarea1, anchor);
-    			set_input_value(textarea1, /*responseText*/ ctx[4]);
-    			insert_dev(target, t7, anchor);
-    			insert_dev(target, button2, anchor);
 
     			if (!mounted) {
     				dispose = [
     					listen_dev(button0, "click", /*click_handler*/ ctx[5], false, false, false, false),
-    					listen_dev(textarea0, "input", /*textarea0_input_handler*/ ctx[6]),
-    					listen_dev(button1, "click", /*click_handler_1*/ ctx[7], false, false, false, false),
-    					listen_dev(textarea1, "input", /*textarea1_input_handler*/ ctx[8]),
-    					listen_dev(button2, "click", /*click_handler_2*/ ctx[9], false, false, false, false)
+    					listen_dev(textarea, "input", /*textarea_input_handler*/ ctx[6]),
+    					listen_dev(button1, "click", /*click_handler_1*/ ctx[7], false, false, false, false)
     				];
 
     				mounted = true;
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*copiedText*/ 8) {
-    				set_input_value(textarea0, /*copiedText*/ ctx[3]);
-    			}
-
-    			if (dirty & /*responseText*/ 16) {
-    				set_input_value(textarea1, /*responseText*/ ctx[4]);
+    			if (dirty & /*responseText*/ 8) {
+    				set_input_value(textarea, /*responseText*/ ctx[3]);
     			}
     		},
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(h1);
-    			if (detaching) detach_dev(t1);
     			if (detaching) detach_dev(button0);
-    			if (detaching) detach_dev(t3);
-    			if (detaching) detach_dev(textarea0);
-    			if (detaching) detach_dev(t4);
+    			if (detaching) detach_dev(t1);
+    			if (detaching) detach_dev(textarea);
+    			if (detaching) detach_dev(t2);
     			if (detaching) detach_dev(button1);
-    			if (detaching) detach_dev(t6);
-    			if (detaching) detach_dev(textarea1);
-    			if (detaching) detach_dev(t7);
-    			if (detaching) detach_dev(button2);
     			mounted = false;
     			run_all(dispose);
     		}
@@ -3148,9 +3087,9 @@ A &amp;= B + C - D \\\\ \\\\
     		const message = event.data;
 
     		if (message.type === 'setCopiedText') {
-    			$$invalidate(3, copiedText = message.value);
+    			$$invalidate(2, copiedText = message.value);
     		} else if (message.type === 'responseText') {
-    			$$invalidate(4, responseText = message.value);
+    			$$invalidate(3, responseText = message.value);
     		}
     	});
 
@@ -3174,26 +3113,19 @@ A &amp;= B + C - D \\\\ \\\\
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console_1$1.warn(`<Generate> was created with unknown prop '${key}'`);
     	});
 
-    	const click_handler = () => getSelectedText();
+    	const click_handler = () => sendText(copiedText, 'Generate');
 
-    	function textarea0_input_handler() {
-    		copiedText = this.value;
-    		$$invalidate(3, copiedText);
-    	}
-
-    	const click_handler_1 = () => sendText(copiedText, 'Generate');
-
-    	function textarea1_input_handler() {
+    	function textarea_input_handler() {
     		responseText = this.value;
-    		$$invalidate(4, responseText);
+    		$$invalidate(3, responseText);
     	}
 
-    	const click_handler_2 = () => replaceSelectedText(responseText);
+    	const click_handler_1 = () => replaceSelectedText(responseText);
 
     	$$self.$$set = $$props => {
-    		if ('getSelectedText' in $$props) $$invalidate(0, getSelectedText = $$props.getSelectedText);
-    		if ('sendText' in $$props) $$invalidate(1, sendText = $$props.sendText);
-    		if ('replaceSelectedText' in $$props) $$invalidate(2, replaceSelectedText = $$props.replaceSelectedText);
+    		if ('getSelectedText' in $$props) $$invalidate(4, getSelectedText = $$props.getSelectedText);
+    		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
+    		if ('replaceSelectedText' in $$props) $$invalidate(1, replaceSelectedText = $$props.replaceSelectedText);
     	};
 
     	$$self.$capture_state = () => ({
@@ -3205,11 +3137,11 @@ A &amp;= B + C - D \\\\ \\\\
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('getSelectedText' in $$props) $$invalidate(0, getSelectedText = $$props.getSelectedText);
-    		if ('sendText' in $$props) $$invalidate(1, sendText = $$props.sendText);
-    		if ('replaceSelectedText' in $$props) $$invalidate(2, replaceSelectedText = $$props.replaceSelectedText);
-    		if ('copiedText' in $$props) $$invalidate(3, copiedText = $$props.copiedText);
-    		if ('responseText' in $$props) $$invalidate(4, responseText = $$props.responseText);
+    		if ('getSelectedText' in $$props) $$invalidate(4, getSelectedText = $$props.getSelectedText);
+    		if ('sendText' in $$props) $$invalidate(0, sendText = $$props.sendText);
+    		if ('replaceSelectedText' in $$props) $$invalidate(1, replaceSelectedText = $$props.replaceSelectedText);
+    		if ('copiedText' in $$props) $$invalidate(2, copiedText = $$props.copiedText);
+    		if ('responseText' in $$props) $$invalidate(3, responseText = $$props.responseText);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -3217,16 +3149,14 @@ A &amp;= B + C - D \\\\ \\\\
     	}
 
     	return [
-    		getSelectedText,
     		sendText,
     		replaceSelectedText,
     		copiedText,
     		responseText,
+    		getSelectedText,
     		click_handler,
-    		textarea0_input_handler,
-    		click_handler_1,
-    		textarea1_input_handler,
-    		click_handler_2
+    		textarea_input_handler,
+    		click_handler_1
     	];
     }
 
@@ -3235,9 +3165,9 @@ A &amp;= B + C - D \\\\ \\\\
     		super(options);
 
     		init(this, options, instance$2, create_fragment$2, safe_not_equal, {
-    			getSelectedText: 0,
-    			sendText: 1,
-    			replaceSelectedText: 2
+    			getSelectedText: 4,
+    			sendText: 0,
+    			replaceSelectedText: 1
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {

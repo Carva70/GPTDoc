@@ -499,11 +499,21 @@ class SidebarProvider {
             case 'Generate': {
                 if (editor) {
                     const entireDocument = editor.document.getText();
-                    prompt = `Document:\n${entireDocument}\nGenerate:\n${selected}\n`;
+                    const cursorPosition = editor.selection.active;
+                    const currentLineIndex = cursorPosition.line;
+                    const codeAboveCursor = entireDocument
+                        .split('\n')
+                        .slice(0, currentLineIndex)
+                        .join('\n');
+                    const codeBelowCursor = entireDocument
+                        .split('\n')
+                        .slice(currentLineIndex + 1)
+                        .join('\n');
+                    prompt = `Document:\n${codeAboveCursor}\n*** Insert Code Here ***\n${codeBelowCursor}\n`;
                     systemMessage =
-                        'You are an assistant tasked with generating code based on the provided prompt and the entire document. Follow these guidelines:\n' +
+                        'You are an assistant tasked with generating code based on the provided prompt and the current line where the cursor is positioned. Follow these guidelines:\n' +
                             '- Utilize the prompt to guide the generation process.\n' +
-                            '- Consider the context provided by the entire document.\n' +
+                            '- Consider the context provided by the code above, below, and at the cursor position.\n' +
                             '- Generate code that is relevant and follows best practices.\n' +
                             '- Respond with only the code in text format. Do not return a markdown or any other format. Type the code directly.\n\n' +
                             '**Example**:\n' +
@@ -512,13 +522,11 @@ class SidebarProvider {
                             'def mult(a, b):\n' +
                             '    return a * b\n' +
                             '# Exponential function using mult function\n\n' +
+                            '*** Insert Code Here ***\n' +
                             '# Add function\n' +
                             'def add(a, b):\n' +
                             '    return a + b\n' +
-                            'Generate:\n' +
-                            '# Exponential function using mult function\n' +
                             '**Your Response**:\n' +
-                            '# Exponential function using mult function\n' +
                             'def exponential(a, b):\n' +
                             '    result = 1\n' +
                             '    for _ in range(b):\n' +
