@@ -181,7 +181,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         const code = editor.document.getText();
         const codePrompt = `Please provide a concise overview of the code:\n${code}\n`;
 
-        const systemMessageClasses = `You are an assistant. Summarize each class by listing its attributes and their types in a few words:\n`;
+        const systemMessageClasses = `You are an assistant. Summarize each class by listing its attributes (and their types) and methods in a few words:\n`;
 
         const systemMessageRelations = `You are an assistant. Review the code for class relations. For each class, mention any relations using 4-5 words. Classify as aggregation, composition, extension, etc. Also, specify one-to-one, one-to-many, or many-to-many relations:\n`;
 
@@ -213,15 +213,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         }
 
         const code = editor.document.getText();
-        const codePrompt = `Provide a concise overview of the code:\n${code}\n`;
+        const codePrompt = `Code:\n${code}\n`;
 
         const introFuncMsg =
             'You are an assistant. Generate the Introduction and Functionality sections for the LaTeX documentation.\n' +
             'Provide a brief explanation of the code and explain what it does and how it achieves its purpose.\n' +
             'The response must be 2 sections in latex format.\n' +
+            'List using itemize.\n' +
             'Response example:\n' +
             '\\section{Introduction}\n' +
-            'This code implements a sorting algorithm using a divide and conquer approach.\n' +
+            'In this document we present a sorting algorithm using a divide and conquer approach.\n' +
             '\\section{Functionality}\n' +
             'It takes an unsorted array as input and returns the array sorted in ascending order.\n';
 
@@ -261,13 +262,25 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             'sortArray(strArray, strArray.length);\n' +
             '\\end{verbatim}\n';
 
-        const respIntroFunc = await this.callPrompt(codePrompt, introFuncMsg);
+        const respIntroFunc = await this.callPrompt(
+            codePrompt +
+                'Give me a long detailed code in LaTeX format about the Introduction and Functionality in plain text.',
+            introFuncMsg,
+        );
         console.log(respIntroFunc);
 
-        const respParamsReturnVals = await this.callPrompt(codePrompt, paramsReturnValsMsg);
+        const respParamsReturnVals = await this.callPrompt(
+            codePrompt +
+                'Give me a long detailed code in LaTeX format about the Parameters and Return Values in plain text.',
+            paramsReturnValsMsg,
+        );
         console.log(respParamsReturnVals);
 
-        const respUsageExamples = await this.callPrompt(codePrompt, usageExamplesMsg);
+        const respUsageExamples = await this.callPrompt(
+            codePrompt +
+                'Give me a long detailed code in LaTeX format about the Usage and Examples sections in plain text.',
+            usageExamplesMsg,
+        );
         console.log(respUsageExamples);
 
         if (respIntroFunc && respParamsReturnVals && respUsageExamples) {
@@ -377,7 +390,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                     '- Include both normal and edge cases in your test suite.\n' +
                     '- Use the syntax in the programming language of the user text.\n' +
                     "- In non python lenguages, dont use assert, use other type of test that doesn't require libraries.\n" +
-                    '- Respond with only the code in text format. Do not return a markdown or any other format. Type the code directly.\n\n' +
+                    '- Respond with only the code in text format. Do not return a markdown or any other format.\n' +
+                    '- Dont put any explanation at the end or beginning and type the code directly.\n\n' +
                     'Example:\n' +
                     'User code:\n' +
                     'def add_numbers(a, b):\n' +
@@ -485,7 +499,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             case 'Document': {
                 if (editor) {
                     const entireDocument = editor.document.getText();
-                    prompt = `Document:\n${entireDocument}\nGenerate:\n${selected}\n`;
+                    prompt = `Document:\n${entireDocument}\n\n Generate a detailed latex document based on this code\n`;
 
                     systemMessage =
                         'You are an assistant tasked with generating a detailed LaTeX documentation for the provided code. Follow these guidelines:\n' +
@@ -501,7 +515,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                         '}\n' +
                         'Your Response:\n' +
                         '\\section{Introduction}\n' +
-                        'This code defines a function to add two numbers.\n\n' +
+                        'In this document we present a function to add two numbers.\n\n' +
                         '\\section{Functionality}\n' +
                         'The function takes two parameters and returns their sum.\n\n' +
                         '\\section{Parameters}\n' +
@@ -525,7 +539,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             case 'Uml': {
                 if (editor) {
                     const code = editor.document.getText();
-                    prompt = `Code:\n${code}\n`;
+                    prompt = `Code:\n${code}\n Generate the PlantUML diagram, only give me the diagram in text format. No explanation needed`;
 
                     systemMessage =
                         'You are an assistant tasked with generating a comprehensive UML diagram from the provided code. The code represents a system with various classes and relationships. Follow these guidelines:\n' +
@@ -597,7 +611,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         const data = {
             system_message: systemMessage,
             user_message: prompt,
-            max_seq_len: 5000,
+            max_seq_len: this._maxTokens,
         };
 
         try {

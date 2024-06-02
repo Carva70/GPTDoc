@@ -44,30 +44,18 @@
 </label>
 
 <label>
-    Use ChatGPT (requires session key):
-    <input bind:checked={useChat} type="checkbox" on:change={handleUseChat} />
-</label>
-
-<label>
-    {#if useChat}
-        ChatGPT Session Key:
-    {:else}
-        API Key:
-    {/if}
-
+    API Key:
     <input bind:value={apiKey} type="password" on:change={handleApiKey} />
 </label>
 
-{#if !useChat}
-    <label>
-        Select model:
-        <select bind:value={currentModel} on:change={handleSelection}>
-            {#each openaiModels as model (model)}
-                <option value={model}>{model}</option>
-            {/each}
-        </select>
-    </label>
-{/if}
+<label>
+    Select model:
+    <select bind:value={currentModel} on:change={handleSelection}>
+        {#each openaiModels as model (model)}
+            <option value={model}>{model}</option>
+        {/each}
+    </select>
+</label>
 
 <label>
     Max token response:

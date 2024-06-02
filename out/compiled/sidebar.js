@@ -676,7 +676,7 @@ var app = (function () {
     			t13 = space();
     			li7 = element("li");
     			button7 = element("button");
-    			button7.textContent = "Misc";
+    			button7.textContent = "UML";
     			t15 = space();
     			li8 = element("li");
     			button8 = element("button");
@@ -706,8 +706,8 @@ var app = (function () {
     			add_location(button7, file$9, 34, 12, 991);
     			add_location(li7, file$9, 33, 8, 973);
     			attr_dev(button8, "class", "svelte-1862z36");
-    			add_location(button8, file$9, 37, 12, 1091);
-    			add_location(li8, file$9, 36, 8, 1073);
+    			add_location(button8, file$9, 37, 12, 1090);
+    			add_location(li8, file$9, 36, 8, 1072);
     			attr_dev(ul, "class", "svelte-1862z36");
     			add_location(ul, file$9, 11, 4, 225);
     			attr_dev(nav, "class", "svelte-1862z36");
@@ -1621,160 +1621,14 @@ var app = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[17] = list[i];
+    	child_ctx[16] = list[i];
     	return child_ctx;
     }
 
-    // (54:4) {:else}
-    function create_else_block(ctx) {
-    	let t;
-
-    	const block = {
-    		c: function create() {
-    			t = text("API Key:");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, t, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(t);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block.name,
-    		type: "else",
-    		source: "(54:4) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (52:4) {#if useChat}
-    function create_if_block_1$1(ctx) {
-    	let t;
-
-    	const block = {
-    		c: function create() {
-    			t = text("ChatGPT Session Key:");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, t, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(t);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_1$1.name,
-    		type: "if",
-    		source: "(52:4) {#if useChat}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (61:0) {#if !useChat}
-    function create_if_block$2(ctx) {
-    	let label;
-    	let t;
-    	let select;
-    	let each_blocks = [];
-    	let each_1_lookup = new Map();
-    	let mounted;
-    	let dispose;
-    	let each_value = /*openaiModels*/ ctx[5];
-    	validate_each_argument(each_value);
-    	const get_key = ctx => /*model*/ ctx[17];
-    	validate_each_keys(ctx, each_value, get_each_context, get_key);
-
-    	for (let i = 0; i < each_value.length; i += 1) {
-    		let child_ctx = get_each_context(ctx, each_value, i);
-    		let key = get_key(child_ctx);
-    		each_1_lookup.set(key, each_blocks[i] = create_each_block(key, child_ctx));
-    	}
-
-    	const block = {
-    		c: function create() {
-    			label = element("label");
-    			t = text("Select model:\r\n        ");
-    			select = element("select");
-
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].c();
-    			}
-
-    			if (/*currentModel*/ ctx[0] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[14].call(select));
-    			add_location(select, file$5, 63, 8, 1517);
-    			attr_dev(label, "class", "svelte-1guvdyr");
-    			add_location(label, file$5, 61, 4, 1477);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, label, anchor);
-    			append_dev(label, t);
-    			append_dev(label, select);
-
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				if (each_blocks[i]) {
-    					each_blocks[i].m(select, null);
-    				}
-    			}
-
-    			select_option(select, /*currentModel*/ ctx[0], true);
-
-    			if (!mounted) {
-    				dispose = [
-    					listen_dev(select, "change", /*select_change_handler*/ ctx[14]),
-    					listen_dev(select, "change", /*handleSelection*/ ctx[6], false, false, false, false)
-    				];
-
-    				mounted = true;
-    			}
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty & /*openaiModels*/ 32) {
-    				each_value = /*openaiModels*/ ctx[5];
-    				validate_each_argument(each_value);
-    				validate_each_keys(ctx, each_value, get_each_context, get_key);
-    				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, select, destroy_block, create_each_block, null, get_each_context);
-    			}
-
-    			if (dirty & /*currentModel, openaiModels*/ 33) {
-    				select_option(select, /*currentModel*/ ctx[0]);
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(label);
-
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].d();
-    			}
-
-    			mounted = false;
-    			run_all(dispose);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block$2.name,
-    		type: "if",
-    		source: "(61:0) {#if !useChat}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (65:12) {#each openaiModels as model (model)}
+    // (54:8) {#each openaiModels as model (model)}
     function create_each_block(key_1, ctx) {
     	let option;
-    	let t_value = /*model*/ ctx[17] + "";
+    	let t_value = /*model*/ ctx[16] + "";
     	let t;
     	let option_value_value;
 
@@ -1784,9 +1638,9 @@ var app = (function () {
     		c: function create() {
     			option = element("option");
     			t = text(t_value);
-    			option.__value = option_value_value = /*model*/ ctx[17];
+    			option.__value = option_value_value = /*model*/ ctx[16];
     			option.value = option.__value;
-    			add_location(option, file$5, 65, 16, 1648);
+    			add_location(option, file$5, 54, 12, 1391);
     			this.first = option;
     		},
     		m: function mount(target, anchor) {
@@ -1795,9 +1649,9 @@ var app = (function () {
     		},
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
-    			if (dirty & /*openaiModels*/ 32 && t_value !== (t_value = /*model*/ ctx[17] + "")) set_data_dev(t, t_value);
+    			if (dirty & /*openaiModels*/ 16 && t_value !== (t_value = /*model*/ ctx[16] + "")) set_data_dev(t, t_value);
 
-    			if (dirty & /*openaiModels*/ 32 && option_value_value !== (option_value_value = /*model*/ ctx[17])) {
+    			if (dirty & /*openaiModels*/ 16 && option_value_value !== (option_value_value = /*model*/ ctx[16])) {
     				prop_dev(option, "__value", option_value_value);
     				option.value = option.__value;
     			}
@@ -1811,7 +1665,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(65:12) {#each openaiModels as model (model)}",
+    		source: "(54:8) {#each openaiModels as model (model)}",
     		ctx
     	});
 
@@ -1831,23 +1685,25 @@ var app = (function () {
     	let t5;
     	let label2;
     	let t6;
-    	let input2;
+    	let select;
+    	let each_blocks = [];
+    	let each_1_lookup = new Map();
     	let t7;
-    	let t8;
     	let label3;
-    	let t9;
-    	let input3;
+    	let t8;
+    	let input2;
     	let mounted;
     	let dispose;
+    	let each_value = /*openaiModels*/ ctx[4];
+    	validate_each_argument(each_value);
+    	const get_key = ctx => /*model*/ ctx[16];
+    	validate_each_keys(ctx, each_value, get_each_context, get_key);
 
-    	function select_block_type(ctx, dirty) {
-    		if (/*useChat*/ ctx[3]) return create_if_block_1$1;
-    		return create_else_block;
+    	for (let i = 0; i < each_value.length; i += 1) {
+    		let child_ctx = get_each_context(ctx, each_value, i);
+    		let key = get_key(child_ctx);
+    		each_1_lookup.set(key, each_blocks[i] = create_each_block(key, child_ctx));
     	}
-
-    	let current_block_type = select_block_type(ctx);
-    	let if_block0 = current_block_type(ctx);
-    	let if_block1 = !/*useChat*/ ctx[3] && create_if_block$2(ctx);
 
     	const block = {
     		c: function create() {
@@ -1859,36 +1715,38 @@ var app = (function () {
     			input0 = element("input");
     			t3 = space();
     			label1 = element("label");
-    			t4 = text("Use ChatGPT (requires session key):\r\n    ");
+    			t4 = text("API Key:\r\n    ");
     			input1 = element("input");
     			t5 = space();
     			label2 = element("label");
-    			if_block0.c();
-    			t6 = space();
-    			input2 = element("input");
+    			t6 = text("Select model:\r\n    ");
+    			select = element("select");
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].c();
+    			}
+
     			t7 = space();
-    			if (if_block1) if_block1.c();
-    			t8 = space();
     			label3 = element("label");
-    			t9 = text("Max token response:\r\n    ");
-    			input3 = element("input");
+    			t8 = text("Max token response:\r\n    ");
+    			input2 = element("input");
     			add_location(h1, file$5, 38, 0, 976);
     			attr_dev(input0, "type", "checkbox");
     			add_location(input0, file$5, 42, 4, 1029);
     			attr_dev(label0, "class", "svelte-1guvdyr");
     			add_location(label0, file$5, 40, 0, 996);
-    			attr_dev(input1, "type", "checkbox");
-    			add_location(input1, file$5, 47, 4, 1179);
+    			attr_dev(input1, "type", "password");
+    			add_location(input1, file$5, 47, 4, 1152);
     			attr_dev(label1, "class", "svelte-1guvdyr");
     			add_location(label1, file$5, 45, 0, 1125);
-    			attr_dev(input2, "type", "password");
-    			add_location(input2, file$5, 57, 4, 1373);
+    			if (/*currentModel*/ ctx[0] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[12].call(select));
+    			add_location(select, file$5, 52, 4, 1268);
     			attr_dev(label2, "class", "svelte-1guvdyr");
-    			add_location(label2, file$5, 50, 0, 1267);
-    			attr_dev(input3, "type", "number");
-    			add_location(input3, file$5, 73, 4, 1789);
+    			add_location(label2, file$5, 50, 0, 1236);
+    			attr_dev(input2, "type", "number");
+    			add_location(input2, file$5, 61, 4, 1513);
     			attr_dev(label3, "class", "svelte-1guvdyr");
-    			add_location(label3, file$5, 71, 0, 1751);
+    			add_location(label3, file$5, 59, 0, 1475);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1899,79 +1757,67 @@ var app = (function () {
     			insert_dev(target, label0, anchor);
     			append_dev(label0, t2);
     			append_dev(label0, input0);
-    			input0.checked = /*useLocalApi*/ ctx[4];
+    			input0.checked = /*useLocalApi*/ ctx[3];
     			insert_dev(target, t3, anchor);
     			insert_dev(target, label1, anchor);
     			append_dev(label1, t4);
     			append_dev(label1, input1);
-    			input1.checked = /*useChat*/ ctx[3];
+    			set_input_value(input1, /*apiKey*/ ctx[2]);
     			insert_dev(target, t5, anchor);
     			insert_dev(target, label2, anchor);
-    			if_block0.m(label2, null);
     			append_dev(label2, t6);
-    			append_dev(label2, input2);
-    			set_input_value(input2, /*apiKey*/ ctx[2]);
+    			append_dev(label2, select);
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				if (each_blocks[i]) {
+    					each_blocks[i].m(select, null);
+    				}
+    			}
+
+    			select_option(select, /*currentModel*/ ctx[0], true);
     			insert_dev(target, t7, anchor);
-    			if (if_block1) if_block1.m(target, anchor);
-    			insert_dev(target, t8, anchor);
     			insert_dev(target, label3, anchor);
-    			append_dev(label3, t9);
-    			append_dev(label3, input3);
-    			set_input_value(input3, /*maxTokens*/ ctx[1]);
+    			append_dev(label3, t8);
+    			append_dev(label3, input2);
+    			set_input_value(input2, /*maxTokens*/ ctx[1]);
 
     			if (!mounted) {
     				dispose = [
-    					listen_dev(input0, "change", /*input0_change_handler*/ ctx[11]),
-    					listen_dev(input0, "change", /*handleUseLocalApi*/ ctx[10], false, false, false, false),
-    					listen_dev(input1, "change", /*input1_change_handler*/ ctx[12]),
-    					listen_dev(input1, "change", /*handleUseChat*/ ctx[9], false, false, false, false),
+    					listen_dev(input0, "change", /*input0_change_handler*/ ctx[10]),
+    					listen_dev(input0, "change", /*handleUseLocalApi*/ ctx[8], false, false, false, false),
+    					listen_dev(input1, "input", /*input1_input_handler*/ ctx[11]),
+    					listen_dev(input1, "change", /*handleApiKey*/ ctx[7], false, false, false, false),
+    					listen_dev(select, "change", /*select_change_handler*/ ctx[12]),
+    					listen_dev(select, "change", /*handleSelection*/ ctx[5], false, false, false, false),
     					listen_dev(input2, "input", /*input2_input_handler*/ ctx[13]),
-    					listen_dev(input2, "change", /*handleApiKey*/ ctx[8], false, false, false, false),
-    					listen_dev(input3, "input", /*input3_input_handler*/ ctx[15]),
-    					listen_dev(input3, "change", /*handleMaxTokens*/ ctx[7], false, false, false, false)
+    					listen_dev(input2, "change", /*handleMaxTokens*/ ctx[6], false, false, false, false)
     				];
 
     				mounted = true;
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*useLocalApi*/ 16) {
-    				input0.checked = /*useLocalApi*/ ctx[4];
+    			if (dirty & /*useLocalApi*/ 8) {
+    				input0.checked = /*useLocalApi*/ ctx[3];
     			}
 
-    			if (dirty & /*useChat*/ 8) {
-    				input1.checked = /*useChat*/ ctx[3];
+    			if (dirty & /*apiKey*/ 4 && input1.value !== /*apiKey*/ ctx[2]) {
+    				set_input_value(input1, /*apiKey*/ ctx[2]);
     			}
 
-    			if (current_block_type !== (current_block_type = select_block_type(ctx))) {
-    				if_block0.d(1);
-    				if_block0 = current_block_type(ctx);
-
-    				if (if_block0) {
-    					if_block0.c();
-    					if_block0.m(label2, t6);
-    				}
+    			if (dirty & /*openaiModels*/ 16) {
+    				each_value = /*openaiModels*/ ctx[4];
+    				validate_each_argument(each_value);
+    				validate_each_keys(ctx, each_value, get_each_context, get_key);
+    				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, select, destroy_block, create_each_block, null, get_each_context);
     			}
 
-    			if (dirty & /*apiKey*/ 4 && input2.value !== /*apiKey*/ ctx[2]) {
-    				set_input_value(input2, /*apiKey*/ ctx[2]);
+    			if (dirty & /*currentModel, openaiModels*/ 17) {
+    				select_option(select, /*currentModel*/ ctx[0]);
     			}
 
-    			if (!/*useChat*/ ctx[3]) {
-    				if (if_block1) {
-    					if_block1.p(ctx, dirty);
-    				} else {
-    					if_block1 = create_if_block$2(ctx);
-    					if_block1.c();
-    					if_block1.m(t8.parentNode, t8);
-    				}
-    			} else if (if_block1) {
-    				if_block1.d(1);
-    				if_block1 = null;
-    			}
-
-    			if (dirty & /*maxTokens*/ 2 && to_number(input3.value) !== /*maxTokens*/ ctx[1]) {
-    				set_input_value(input3, /*maxTokens*/ ctx[1]);
+    			if (dirty & /*maxTokens*/ 2 && to_number(input2.value) !== /*maxTokens*/ ctx[1]) {
+    				set_input_value(input2, /*maxTokens*/ ctx[1]);
     			}
     		},
     		i: noop,
@@ -1984,10 +1830,12 @@ var app = (function () {
     			if (detaching) detach_dev(label1);
     			if (detaching) detach_dev(t5);
     			if (detaching) detach_dev(label2);
-    			if_block0.d();
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].d();
+    			}
+
     			if (detaching) detach_dev(t7);
-    			if (if_block1) if_block1.d(detaching);
-    			if (detaching) detach_dev(t8);
     			if (detaching) detach_dev(label3);
     			mounted = false;
     			run_all(dispose);
@@ -2032,12 +1880,12 @@ var app = (function () {
     	}
 
     	function handleUseChat(event) {
-    		$$invalidate(3, useChat = event.target.checked);
+    		$$invalidate(9, useChat = event.target.checked);
     		dispatch('changeUseChat', useChat);
     	}
 
     	function handleUseLocalApi(event) {
-    		$$invalidate(4, useLocalApi = event.target.checked);
+    		$$invalidate(3, useLocalApi = event.target.checked);
     		dispatch('changeUseLocalApi', useLocalApi);
     	}
 
@@ -2082,15 +1930,10 @@ var app = (function () {
 
     	function input0_change_handler() {
     		useLocalApi = this.checked;
-    		$$invalidate(4, useLocalApi);
+    		$$invalidate(3, useLocalApi);
     	}
 
-    	function input1_change_handler() {
-    		useChat = this.checked;
-    		$$invalidate(3, useChat);
-    	}
-
-    	function input2_input_handler() {
+    	function input1_input_handler() {
     		apiKey = this.value;
     		$$invalidate(2, apiKey);
     	}
@@ -2098,21 +1941,21 @@ var app = (function () {
     	function select_change_handler() {
     		currentModel = select_value(this);
     		$$invalidate(0, currentModel);
-    		$$invalidate(5, openaiModels);
+    		$$invalidate(4, openaiModels);
     	}
 
-    	function input3_input_handler() {
+    	function input2_input_handler() {
     		maxTokens = to_number(this.value);
     		$$invalidate(1, maxTokens);
     	}
 
     	$$self.$$set = $$props => {
-    		if ('openaiModels' in $$props) $$invalidate(5, openaiModels = $$props.openaiModels);
+    		if ('openaiModels' in $$props) $$invalidate(4, openaiModels = $$props.openaiModels);
     		if ('currentModel' in $$props) $$invalidate(0, currentModel = $$props.currentModel);
     		if ('maxTokens' in $$props) $$invalidate(1, maxTokens = $$props.maxTokens);
     		if ('apiKey' in $$props) $$invalidate(2, apiKey = $$props.apiKey);
-    		if ('useChat' in $$props) $$invalidate(3, useChat = $$props.useChat);
-    		if ('useLocalApi' in $$props) $$invalidate(4, useLocalApi = $$props.useLocalApi);
+    		if ('useChat' in $$props) $$invalidate(9, useChat = $$props.useChat);
+    		if ('useLocalApi' in $$props) $$invalidate(3, useLocalApi = $$props.useLocalApi);
     	};
 
     	$$self.$capture_state = () => ({
@@ -2132,12 +1975,12 @@ var app = (function () {
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('openaiModels' in $$props) $$invalidate(5, openaiModels = $$props.openaiModels);
+    		if ('openaiModels' in $$props) $$invalidate(4, openaiModels = $$props.openaiModels);
     		if ('currentModel' in $$props) $$invalidate(0, currentModel = $$props.currentModel);
     		if ('maxTokens' in $$props) $$invalidate(1, maxTokens = $$props.maxTokens);
     		if ('apiKey' in $$props) $$invalidate(2, apiKey = $$props.apiKey);
-    		if ('useChat' in $$props) $$invalidate(3, useChat = $$props.useChat);
-    		if ('useLocalApi' in $$props) $$invalidate(4, useLocalApi = $$props.useLocalApi);
+    		if ('useChat' in $$props) $$invalidate(9, useChat = $$props.useChat);
+    		if ('useLocalApi' in $$props) $$invalidate(3, useLocalApi = $$props.useLocalApi);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -2148,19 +1991,17 @@ var app = (function () {
     		currentModel,
     		maxTokens,
     		apiKey,
-    		useChat,
     		useLocalApi,
     		openaiModels,
     		handleSelection,
     		handleMaxTokens,
     		handleApiKey,
-    		handleUseChat,
     		handleUseLocalApi,
+    		useChat,
     		input0_change_handler,
-    		input1_change_handler,
-    		input2_input_handler,
+    		input1_input_handler,
     		select_change_handler,
-    		input3_input_handler
+    		input2_input_handler
     	];
     }
 
@@ -2169,12 +2010,12 @@ var app = (function () {
     		super(options);
 
     		init(this, options, instance$6, create_fragment$6, safe_not_equal, {
-    			openaiModels: 5,
+    			openaiModels: 4,
     			currentModel: 0,
     			maxTokens: 1,
     			apiKey: 2,
-    			useChat: 3,
-    			useLocalApi: 4
+    			useChat: 9,
+    			useLocalApi: 3
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -3219,7 +3060,7 @@ var app = (function () {
     			attr_dev(img, "alt", "");
     			set_style(img, "max-width", "100%");
     			set_style(img, "height", "auto");
-    			add_location(img, file, 28, 4, 807);
+    			add_location(img, file, 28, 4, 806);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
@@ -3262,7 +3103,7 @@ var app = (function () {
     	const block = {
     		c: function create() {
     			h1 = element("h1");
-    			h1.textContent = "Misc view";
+    			h1.textContent = "UML view";
     			t1 = space();
     			button0 = element("button");
     			button0.textContent = "Generate uml (single prompt)";
@@ -3275,12 +3116,12 @@ var app = (function () {
     			if (if_block) if_block.c();
     			if_block_anchor = empty();
     			add_location(h1, file, 18, 0, 468);
-    			add_location(button0, file, 20, 0, 490);
-    			add_location(button1, file, 22, 0, 584);
+    			add_location(button0, file, 20, 0, 489);
+    			add_location(button1, file, 22, 0, 583);
     			attr_dev(textarea, "placeholder", "Response...");
     			set_style(textarea, "width", "100%");
     			set_style(textarea, "height", "200px");
-    			add_location(textarea, file, 24, 0, 667);
+    			add_location(textarea, file, 24, 0, 666);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");

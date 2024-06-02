@@ -16,7 +16,7 @@
     });
 </script>
 
-<h1>Misc view</h1>
+<h1>UML view</h1>
 
 <button on:click={() => sendText(copiedText, 'Uml')}>Generate uml (single prompt)</button>
 

@@ -32,7 +32,7 @@
             <button on:click={() => setNavView('Generate')}>Generate</button>
         </li>
         <li>
-            <button on:click={() => setNavView('Misc')}>Misc</button>
+            <button on:click={() => setNavView('Misc')}>UML</button>
         </li>
         <li>
             <button on:click={() => setNavView('Options')}>Options</button>
